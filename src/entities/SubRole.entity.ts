@@ -9,7 +9,10 @@ import {
   CreateDateColumn,
   Timestamp,
   OneToOne,
+  ManyToOne,
+  OneToMany,
 } from 'typeorm';
+import { Admin } from './Admin.entity';
 import { Company } from './Company.entity';
 import { User } from './User.Entity';
 
@@ -36,9 +39,12 @@ export class SubRole extends BaseEntity {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
 
-  @OneToOne(() => User, (user) => user.subrole)
-  user: User;
+  @ManyToOne(() => Admin, (admin) => admin.subrole)
+  admin: Admin;
 
-  @OneToOne(() => Company, (company) => company.subrole)
-  company: Company;
+  @OneToMany(() => User, (user) => user.subrole)
+  user: User[];
+
+  @OneToMany(() => Company, (company) => company.subrole)
+  company: Company[];
 }

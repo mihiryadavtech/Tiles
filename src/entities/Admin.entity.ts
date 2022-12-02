@@ -27,6 +27,7 @@ import { QuantityType } from './QuantityType.entity';
 import { SalesType } from './SalesType.entity';
 import { Size } from './Size.entity';
 import { SponsoredAds } from './SponsoredAds.entity';
+import { SubRole } from './SubRole.entity';
 
 import { Type } from './Type.entity';
 import { Unit } from './Unit.entity';
@@ -38,11 +39,14 @@ export class Admin extends BaseEntity {
   @Column({ name: 'name', type: 'varchar', length: 75 })
   name: string;
 
-  @Column({ name: 'email', type: 'varchar' })
+  @Column({ name: 'email', type: 'varchar', unique: true })
   email: string;
 
   @Column({ name: 'password', type: 'varchar' })
   password: string;
+  
+  @OneToMany(() => SubRole, (subRole) => subRole.admin)
+  subrole: SubRole[];
 
   @OneToMany(() => Type, (type) => type.admin)
   type: Type[];

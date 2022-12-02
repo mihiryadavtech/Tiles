@@ -35,10 +35,10 @@ export class Catalogue extends BaseEntity {
   name: string;
 
   @Column({ name: 'pdf', type: 'jsonb' })
-  pdf: {};
+  pdf: file;
 
   @Column({ name: 'preview_image', type: 'jsonb', nullable: true })
-  prevuewImage: file;
+  previewImage: file;
 
   @Column({ name: 'description', type: 'varchar', length: 500, nullable: true })
   description: string;

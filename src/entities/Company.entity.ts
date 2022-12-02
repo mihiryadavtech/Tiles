@@ -73,8 +73,7 @@ export class Company extends BaseEntity {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
 
-  @OneToOne(() => SubRole, (subrole) => subrole.company)
-  @JoinColumn()
+  @ManyToOne(() => SubRole, (subrole) => subrole.company)
   subrole: SubRole;
 
   @ManyToOne(() => Admin, (admin) => admin.company)

@@ -96,7 +96,7 @@ const AppDataSource = new DataSource({
     User,
     UserDealingCategory
   ],
-  logging: true,
+  logging: false,
   synchronize: true,
 });
 

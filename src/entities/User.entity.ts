@@ -4,8 +4,8 @@ enum Role {
   SELLER = 'Seller',
 }
 enum Doc {
-  ADHAAR = 'Adhaar',
-  PAN_CARD = 'Pan_card',
+  ADHAAR = 'Aadhar',
+  PAN_CARD = 'PanCard',
 }
 
 import {
@@ -19,6 +19,7 @@ import {
   OneToOne,
   JoinColumn,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { BookmarkedCatalogue } from './BookmarkedCatalogue.entity';
 import { Catalogue } from './Catalogue.entity';
@@ -46,13 +47,13 @@ export class User extends BaseEntity {
   @Column({ name: 'profile_photo', type: 'jsonb', nullable: true })
   profilePhoto: file;
 
-  @Column({ type: 'varchar', length: 15 })
+  @Column({ type: 'varchar', length: 15, unique: true })
   mobile: number;
 
   @Column({ name: 'wa_mobile', type: 'varchar', length: 15, nullable: true })
   waMobile: number;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', unique: true })
   email: string;
 
   @Column({ type: 'varchar' })
@@ -89,7 +90,7 @@ export class User extends BaseEntity {
   @Column({ name: 'company_website', type: 'varchar', nullable: true })
   companyWebsite: string;
 
-  @Column({ name: 'visiting_card', type: 'varchar', nullable: true })
+  @Column({ name: 'visiting_card', type: 'jsonb', nullable: true })
   visitingCard: file;
 
   @Column({
@@ -114,7 +115,7 @@ export class User extends BaseEntity {
   lastSeen: Date;
 
   @Column({ type: 'jsonb', nullable: true })
-  meta: () => {};
+  meta: {};
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
@@ -122,8 +123,7 @@ export class User extends BaseEntity {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
 
-  @OneToOne(() => SubRole, (subRole) => subRole.user)
-  @JoinColumn()
+  @ManyToOne(() => SubRole, (subRole) => subRole.user)
   subrole: SubRole;
 
   @OneToMany(() => Subscription, (subscription) => subscription.user)
