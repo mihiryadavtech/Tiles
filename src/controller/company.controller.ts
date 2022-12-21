@@ -24,9 +24,9 @@ const catalogueRepository = AppDataSource.getRepository(Catalogue);
 const createCompany = async (req: Request, res: Response) => {
   try {
     const { adminId, subRoleId } = req.query;
-    const images = req.files as Record<string, Express.Multer.File[]>;
-    const logo = images.logo[0];
-    const cta = images.cta[0];
+    const images = req?.files as Record<string, Express.Multer.File[]>;
+    const logo = images?.logo?.[0];
+    const cta = images?.cta?.[0];
 
     // console.log(req.body);
     // console.log(images);

@@ -9,7 +9,7 @@ const errorFunction = (error: any) => {
     error: {
       message: error.message,
     },
-    message: ' Somekind Of Error',
+    message: 'Somekind Of Error',
   };
   return errors;
 };

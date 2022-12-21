@@ -16,6 +16,12 @@ const errorFunction = (error: any) => {
   };
   return errors;
 };
+const returnFunction = (_message: string) => {
+  const message = {
+    message: _message,
+  };
+  return message;
+};
 
 const catalogueRepository = AppDataSource.getRepository(Catalogue);
 const subRoleRepository = AppDataSource.getRepository(SubRole);
@@ -32,23 +38,22 @@ const userCataloguePrivate = async (req: Request, res: Response) => {
       .where({ id: userId })
       .getRawOne();
 
-    if (userExist) {
-      const cataloguePrivate = await catalogueRepository
-        .createQueryBuilder()
-        .update(Catalogue)
-        .set({
-          isPrivate: isPrivate,
-        })
-        .where({ id: catalogueId })
-        .andWhere({
-          userOwner: userExist.user_id,
-        })
-        .returning('*')
-        .execute();
-      res.status(200).json({ data: cataloguePrivate.raw[0] });
-    } else {
-      res.status(400).json('User not Exist');
+    if (!userExist) {
+      res.status(400).json(returnFunction('User Exist'));
     }
+    const cataloguePrivate = await catalogueRepository
+      .createQueryBuilder()
+      .update(Catalogue)
+      .set({
+        isPrivate: isPrivate,
+      })
+      .where({ id: catalogueId })
+      .andWhere({
+        userOwner: userExist.user_id,
+      })
+      .returning('*')
+      .execute();
+    res.status(200).json({ data: cataloguePrivate.raw[0] });
   } catch (error) {
     console.log(error);
     const errors = errorFunction(error);
@@ -89,6 +94,5 @@ const companyCataloguePrivate = async (req: Request, res: Response) => {
     res.status(400).json({ errors });
   }
 };
-
 
 export { userCataloguePrivate, companyCataloguePrivate };

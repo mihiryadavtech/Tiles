@@ -7,6 +7,8 @@ import { subroleRouter } from './routes/subrole.routes';
 import { userRouter } from './routes/user.routes';
 import { companyRouter } from './routes/company.routes';
 import { catalogueRouter } from './routes/catelogue.routes';
+import dotenv from 'dotenv';
+dotenv.config();
 const app = express();
 const Port = 2300;
 
