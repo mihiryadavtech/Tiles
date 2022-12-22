@@ -14,7 +14,12 @@
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
     "ci": "yarn format && yarn lint && yarn tsc",
     "prepare": "husky install",
-    "pre-commit": "lint-staged"
+    "pre-commit": "lint-staged",
+    "typeorm":"typeorm-ts-node-esm ",
+    "migration:run" :"typeorm-ts-node-esm migration:run -d ./src/dataBaseConnection.ts",
+    "migration:revert" :"typeorm-ts-node-esm migration:revert -d ./src/dataBaseConnection.ts",
+    "migration:show" :"typeorm-ts-node-esm migration:show -d ./src/dataBaseConnection.ts"
+
   },
   "author": "mihir",
   "license": "MIT",

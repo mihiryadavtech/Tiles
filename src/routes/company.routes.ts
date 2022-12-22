@@ -1,9 +1,11 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
+import { body, validationResult } from 'express-validator';
+
 import {
   companyCreateCatalogue,
   companyDeleteCatalogue,
   companyUpdateCatalogue,
-  createCompany,
+  registerCompany,
   deletecompany,
 } from '../controller/company.controller';
 
@@ -24,14 +26,41 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const router = Router();
-// router.get('/user', getAllUser);
 router.post(
   '/company',
   upload.fields([
     { name: 'logo', maxCount: 1 },
     { name: 'cta', maxCount: 1 },
   ]),
-  createCompany
+  [
+    body('logo', 'select an Image '),
+    body('name').isLength({ min: 3 }).withMessage('Enter your Name '),
+
+    body('mobile')
+      .isLength({ min: 10, max: 10 })
+      .withMessage('Enter the proper Number'),
+    body('email').isEmail().toLowerCase().withMessage('Enter proper Email'),
+    body('password').isLength({ min: 8 }).withMessage('Enter proper Password'),
+    body('website', 'enter the website link'),
+    body('address')
+      .isLength({ min: 20, max: 200 })
+      .withMessage('Enter proper Address'),
+  ],
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const errorArray: string[] = [];
+      errors?.array().forEach((element) => {
+        errorArray.push(element?.msg);
+      });
+
+      console.log(errorArray);
+      return res.status(400).json({ Errors: errorArray });
+    }
+    return next();
+  },
+  registerCompany
 );
 
 // router.patch(

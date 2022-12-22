@@ -31,14 +31,17 @@ export class Company extends BaseEntity {
   @Column({ name: 'logo', type: 'jsonb', nullable: true })
   logo: file;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ name: 'name', type: 'varchar', length: 100 })
   name: string;
 
-  @Column({ type: 'varchar', length: 15 })
+  @Column({ name: 'mobile', type: 'varchar', length: 15 })
   mobile: number;
 
-  @Column({ type: 'varchar' })
+  @Column({ name: 'email', type: 'varchar', unique: true })
   email: string;
+
+  @Column({ name: 'password', type: 'varchar', })
+  password: string;
 
   @Column({ name: ' website', type: 'varchar', nullable: true })
   website: string;

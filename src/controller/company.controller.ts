@@ -21,7 +21,7 @@ const subRoleRepository = AppDataSource.getRepository(SubRole);
 const companyRepository = AppDataSource.getRepository(Company);
 const catalogueRepository = AppDataSource.getRepository(Catalogue);
 
-const createCompany = async (req: Request, res: Response) => {
+const registerCompany = async (req: Request, res: Response) => {
   try {
     const { adminId, subRoleId } = req.query;
     const images = req?.files as Record<string, Express.Multer.File[]>;
@@ -29,13 +29,14 @@ const createCompany = async (req: Request, res: Response) => {
     const cta = images?.cta?.[0];
 
     // console.log(req.body);
-    // console.log(images);
+    console.log(images);
     // console.log(logo);
     // console.log(cta);
     const {
       name,
       mobile,
       email,
+      password,
       website,
       address,
       latitude,
@@ -48,55 +49,44 @@ const createCompany = async (req: Request, res: Response) => {
       admin,
     } = req.body;
 
-    const adminExist = await adminRepository
-      .createQueryBuilder('admin')
+    const subRoleExist = await subRoleRepository
+      .createQueryBuilder('subrole')
       .select()
-      .where({ id: adminId })
+      .where({ id: subRoleId })
       .getRawOne();
 
-    console.log(adminExist);
-    if (adminExist) {
-      const subRoleExist = await subRoleRepository
-        .createQueryBuilder('subrole')
-        .select()
-        .where({ id: subRoleId })
-        .getRawOne();
-
-      if (subRoleExist) {
-        const createdCompany = await companyRepository
-          .createQueryBuilder()
-          .insert()
-          .into(Company)
-          .values({
-            logo: logo,
-            name: name,
-            mobile: mobile,
-            email: email,
-            website: website,
-            address: address,
-            latitude: latitude,
-            longitude: longitude,
-            sponsered: sponsered,
-            verified: verified,
-            disabled: disabled,
-            description: description,
-            cta: cta,
-            admin: adminExist.admin_id,
-            subrole: subRoleExist.subrole_id,
-          })
-          .returning('*')
-          .execute();
-        res.status(200).json({ data: createdCompany.raw[0] });
-      } else {
-        res.status(400).json({ message: "Subrole doesn't Exist" });
-      }
-    } else {
-      res.status(400).json({ message: 'User is Unauthorized' });
+    if (!subRoleExist) {
+      return res.status(400).json({ message: "Subrole doesn't Exist" });
     }
+    const registeredCompany = await companyRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Company)
+      .values({
+        logo: logo,
+        name: name,
+        mobile: mobile,
+        email: email,
+        password: password,
+        website: website,
+        address: address,
+        latitude: latitude,
+        longitude: longitude,
+        sponsered: sponsered,
+        verified: verified,
+        disabled: disabled,
+        cta: cta,
+        description: description,
+        // admin: adminExist.admin_id,
+        // subrole: subRoleExist.subrole_id,
+      })
+      .returning('*')
+      .execute();
+    return res.status(200).json({ data: registeredCompany?.raw?.[0] });
   } catch (error) {
     console.log(error);
     const errors = errorFunction(error);
-    res.status(400).json({ errors });
+    return res.status(400).json({ errors });
   }
 };
 
@@ -366,7 +356,7 @@ const companyDeleteCatalogue = async (req: Request, res: Response) => {
 };
 
 export {
-  createCompany,
+  registerCompany,
   deletecompany,
   companyCreateCatalogue,
   companyUpdateCatalogue,

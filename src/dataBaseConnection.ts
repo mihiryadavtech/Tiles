@@ -94,10 +94,11 @@ const AppDataSource = new DataSource({
     Type,
     Unit,
     User,
-    UserDealingCategory
+    UserDealingCategory,
   ],
+  migrations: ['src/migrations/**/*.ts'],
   logging: false,
-  synchronize: true,
+  synchronize: false,
 });
 
 export { AppDataSource };

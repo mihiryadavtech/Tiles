@@ -74,24 +74,25 @@ const loginAdmin = async (req: Request, res: Response) => {
         email: email,
       })
       .getOne();
+      
     console.log(adminExist?.password);
     if (!adminExist) {
       return res.status(400).json(returnFunction("User doesn't exist"));
     }
     const hashPassword = adminExist?.password;
     const correctPassword = await bcrypt.compare(password, hashPassword);
-    console.log(correctPassword);
+    // console.log(correctPassword);
     if (!correctPassword) {
       return res.status(400).json(returnFunction('Enter the proper password'));
     }
-    console.log(adminExist);
+    
     const token = jwt.sign(
       { user_id: adminExist?.id },
       process.env.TOKEN_KEY as string,
       { expiresIn: '1h' }
     );
-    console.log(token);
-    console.log(process.env.TOKEN_KEY);
+    // console.log(token);
+    // console.log(process.env.TOKEN_KEY);
 
     return res
       .status(400)

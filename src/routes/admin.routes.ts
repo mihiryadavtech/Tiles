@@ -39,7 +39,7 @@ router.post(
   ],
   (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
-  
+
     if (!errors.isEmpty()) {
       const errorArray: string[] = [];
       errors?.array().forEach((element) => {

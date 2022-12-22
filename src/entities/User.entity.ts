@@ -20,6 +20,7 @@ import {
   JoinColumn,
   OneToMany,
   ManyToOne,
+  DeleteDateColumn,
 } from 'typeorm';
 import { BookmarkedCatalogue } from './BookmarkedCatalogue.entity';
 import { Catalogue } from './Catalogue.entity';
@@ -55,6 +56,9 @@ export class User extends BaseEntity {
 
   @Column({ type: 'varchar', unique: true })
   email: string;
+
+  @Column({ type: 'varchar' })
+  password: string;
 
   @Column({ type: 'varchar' })
   country: string;
@@ -122,6 +126,9 @@ export class User extends BaseEntity {
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp' })
+  deletedAt: Date;
 
   @ManyToOne(() => SubRole, (subRole) => subRole.user)
   subrole: SubRole;

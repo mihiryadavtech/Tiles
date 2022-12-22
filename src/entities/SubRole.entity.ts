@@ -40,7 +40,7 @@ export class SubRole extends BaseEntity {
   updatedAt: Date;
 
   @ManyToOne(() => Admin, (admin) => admin.subrole)
-  admin: Admin;
+  admin?: Admin;
 
   @OneToMany(() => User, (user) => user.subrole)
   user: User[];

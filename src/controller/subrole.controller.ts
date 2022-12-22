@@ -20,36 +20,27 @@ const subRoleRepository = AppDataSource.getRepository(SubRole);
 const createSubrole = async (req: Request, res: Response) => {
   try {
     const { adminId } = req.query;
+    // parseInt(adminId);
+    console.log(adminId);
+    const { name, slug, disabled, isDeletable } = req.body;
+    const createdSubrole = await adminRepository
+      .createQueryBuilder()
+      .insert()
+      .into(SubRole)
+      .values({
+        name: name,
+        slug: slug,
+        disabled: disabled,
+        isDeletable: isDeletable,
+        // admin: adminId,
+      })
+      .returning('*')
+      .execute();
 
-    const adminExist = await adminRepository
-      .createQueryBuilder('admin')
-      .select()
-      .where({ id: adminId })
-      .getRawOne();
-
-    if (adminExist) {
-      const { name, slug, disabled, isDeletable } = req.body;
-      const createdSubrole = await adminRepository
-        .createQueryBuilder()
-        .insert()
-        .into(SubRole)
-        .values({
-          name: name,
-          slug: slug,
-          disabled: disabled,
-          isDeletable: isDeletable,
-          admin: adminExist.admin_id,
-        })
-        .returning('*')
-        .execute();
-
-      res.status(200).json({ data: createdSubrole.raw[0] });
-    } else {
-      res.status(400).json({ message: 'Admin not exist' });
-    }
+    return res.status(200).json({ data: createdSubrole?.raw?.[0] });
   } catch (error) {
     const errors = errorFunction(error);
-    res.status(400).json({ errors });
+    return res.status(400).json({ errors });
   }
 };
 
