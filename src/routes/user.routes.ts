@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
   getAllUser,
-  createUser,
+  registerUser,
   updateUser,
   deleteUser,
   userCreateCatalogue,
@@ -32,7 +32,7 @@ router.post(
     { name: 'verificationDoc', maxCount: 1 },
     { name: 'visitingCard', maxCount: 1 },
   ]),
-  createUser
+  registerUser
 );
 
 router.patch(

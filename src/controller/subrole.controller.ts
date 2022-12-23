@@ -19,10 +19,18 @@ const subRoleRepository = AppDataSource.getRepository(SubRole);
 
 const createSubrole = async (req: Request, res: Response) => {
   try {
-    const { adminId } = req.query;
-    // parseInt(adminId);
-    console.log(adminId);
     const { name, slug, disabled, isDeletable } = req.body;
+
+    const user = req.app.get('user');
+    const isAdmin = user?.role;
+    console.log(Boolean(isAdmin));
+
+    if (!(isAdmin === 'Admin')) {
+      return res.json({ message: 'User is unauthorized' });
+    }
+    // console.log('>>>>>>>>>', isAdmin);
+    // console.log(user?.userId);
+
     const createdSubrole = await adminRepository
       .createQueryBuilder()
       .insert()
@@ -32,7 +40,7 @@ const createSubrole = async (req: Request, res: Response) => {
         slug: slug,
         disabled: disabled,
         isDeletable: isDeletable,
-        // admin: adminId,
+        admin: user?.userId,
       })
       .returning('*')
       .execute();

@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
+import authenticateToken from '../middleware/auth';
 import {
   createAdmin,
   getAllAdmin,
@@ -7,7 +8,7 @@ import {
 } from '../controller/admin.controller';
 
 const router = Router();
-router.get('/admin', getAllAdmin);
+router.get('/admin', authenticateToken, getAllAdmin);
 router.post(
   '/admin/signup',
   [

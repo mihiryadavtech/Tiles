@@ -25,10 +25,8 @@ const catalogueRepository = AppDataSource.getRepository(Catalogue);
 const subRoleRepository = AppDataSource.getRepository(SubRole);
 const userRepository = AppDataSource.getRepository(User);
 
-const createUser = async (req: Request, res: Response) => {
+const registerUser = async (req: Request, res: Response) => {
   try {
-    const { adminId } = req.query;
-    const { subRoleId } = req.query;
     const images = req.files as Record<string, Express.Multer.File[]>;
     const profilePhoto = images.profilePhoto[0];
     const visitingCard = images.visitingCard[0];
@@ -51,78 +49,37 @@ const createUser = async (req: Request, res: Response) => {
       verified,
       disabled,
       meta,
+      subroleId,
     } = req.body;
 
-    const adminExist = await adminRepository
-      .createQueryBuilder('admin')
-      .select()
-      .where({ id: adminId })
-      .getRawOne();
-
-    if (adminExist) {
-      const subRoleExist = await subRoleRepository
-        .createQueryBuilder('subrole')
-        .select()
-        .where({ id: subRoleId })
-        .getRawOne();
-
-      if (subRoleExist) {
-        // parseInt(mobile);
-        // parseInt(gstNumber);
-        // parseInt(waMobile);
-        // if (
-        //   typeof name === 'string' &&
-        //   typeof mobile === 'number' &&
-        //   typeof waMobile === 'number' &&
-        //   typeof email === 'string' &&
-        //   typeof country === 'string' &&
-        //   typeof state === 'string' &&
-        //   typeof city === 'string' &&
-        //   typeof gstNumber === 'number' &&
-        //   typeof companyName === 'string' &&
-        //   typeof companyAddress === 'string' &&
-        //   typeof companyWebsite === 'string' &&
-        //   typeof companyWebsite === 'string' &&
-        //   typeof verified === 'boolean' &&
-        //   typeof disabled === 'boolean'
-        // ) {
-        const createdUser = await userRepository
-          .createQueryBuilder()
-          .insert()
-          .into(User)
-          .values({
-            name: name,
-            profilePhoto: profilePhoto,
-            mobile: mobile,
-            waMobile: waMobile,
-            email: email,
-            country: country,
-            state: state,
-            city: city,
-            gstNumber: gstNumber,
-            companyName: companyName,
-            companyAddress: companyAddress,
-            companyWebsite: companyWebsite,
-            visitingCard: visitingCard,
-            verificationDoc: verificationDoc,
-            verified: verified,
-            disabled: disabled,
-            meta: meta,
-            lastSeen: new Date(),
-            subrole: subRoleExist.subrole_id,
-          })
-          .returning('*')
-          .execute();
-        res.status(200).json({ data: createdUser.raw[0] });
-        // } else {
-        //   res.status(400).json({ message: ' Enter proper type' });
-        // }
-      } else {
-        res.status(400).json({ message: "Subrole doesn't Exist" });
-      }
-    } else {
-      res.status(400).json({ message: 'User is Unauthorized' });
-    }
+    const createdUser = await userRepository
+      .createQueryBuilder()
+      .insert()
+      .into(User)
+      .values({
+        name: name,
+        profilePhoto: profilePhoto,
+        mobile: mobile,
+        waMobile: waMobile,
+        email: email,
+        country: country,
+        state: state,
+        city: city,
+        gstNumber: gstNumber,
+        companyName: companyName,
+        companyAddress: companyAddress,
+        companyWebsite: companyWebsite,
+        visitingCard: visitingCard,
+        verificationDoc: verificationDoc,
+        verified: verified,
+        disabled: disabled,
+        meta: meta,
+        lastSeen: Date.now(),
+        subrole: subroleId,
+      })
+      .returning('*')
+      .execute();
+    res.status(200).json({ data: createdUser.raw[0] });
   } catch (error) {
     console.log(error);
     const errors = errorFunction(error);
@@ -398,7 +355,7 @@ const userDeleteCatalogue = async (req: Request, res: Response) => {
 };
 
 export {
-  createUser,
+  registerUser,
   getAllUser,
   updateUser,
   deleteUser,

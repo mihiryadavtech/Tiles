@@ -50,11 +50,11 @@ const createAdmin = async (req: Request, res: Response) => {
         .execute();
 
       const token = jwt.sign(
-        { user_id: createdAdmin?.raw?.[0]?.id },
+        { userId: createdAdmin?.raw?.[0]?.id, role: 'Admin' },
         process.env.TOKEN_KEY as string,
         { expiresIn: '1h' }
       );
-      console.log(token);
+      // console.log(token);
       return res.status(200).json({ data: createdAdmin?.raw?.[0] });
     }
     return res.status(400).json(returnFunction('User already exist'));
@@ -74,7 +74,7 @@ const loginAdmin = async (req: Request, res: Response) => {
         email: email,
       })
       .getOne();
-      
+
     console.log(adminExist?.password);
     if (!adminExist) {
       return res.status(400).json(returnFunction("User doesn't exist"));
@@ -85,9 +85,9 @@ const loginAdmin = async (req: Request, res: Response) => {
     if (!correctPassword) {
       return res.status(400).json(returnFunction('Enter the proper password'));
     }
-    
+
     const token = jwt.sign(
-      { user_id: adminExist?.id },
+      { userId: adminExist?.id, role: 'Admin' },
       process.env.TOKEN_KEY as string,
       { expiresIn: '1h' }
     );
@@ -105,27 +105,22 @@ const loginAdmin = async (req: Request, res: Response) => {
 
 const getAllAdmin = async (req: Request, res: Response) => {
   try {
-    const { id } = req.query;
+    const user = req.app.get('user');
+    const isAdmin = user?.role;
+    console.log(Boolean(isAdmin));
 
-    if (id?.length && id.length >= 1) {
-      const getAdmin = await adminRepository
-        .createQueryBuilder('admin')
-        .select()
-        .where({ id: id })
-        .getRawOne();
-      res.status(200).json({ data: getAdmin });
-    } else if (id === '') {
-      res.status(400).json({ message: 'Enter proper Id' });
-    } else {
-      const getAdmin = await adminRepository
-        .createQueryBuilder('admin')
-        .select()
-        .getMany();
-      res.status(200).json({ data: getAdmin });
+    if (!(isAdmin === 'Admin')) {
+      return res.json({ message: 'User is unauthorized' });
     }
+    const getAllAdmin = await adminRepository
+      .createQueryBuilder('admin')
+      .select()
+      .getMany();
+
+    return res.status(200).json({ data: getAllAdmin });
   } catch (error) {
     const errors = errorFunction(error);
-    res.status(400).json({ errors });
+    return res.status(400).json({ errors });
   }
 };
 export { createAdmin, getAllAdmin, loginAdmin };

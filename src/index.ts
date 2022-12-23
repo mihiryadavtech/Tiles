@@ -1,4 +1,6 @@
 import 'reflect-metadata';
+import dotenv from 'dotenv';
+dotenv.config();
 import express, { Request, Response, urlencoded } from 'express';
 import { AppDataSource } from './dataBaseConnection';
 import { mainRouter } from './routes/main.routes';
@@ -7,8 +9,6 @@ import { subroleRouter } from './routes/subrole.routes';
 import { userRouter } from './routes/user.routes';
 import { companyRouter } from './routes/company.routes';
 import { catalogueRouter } from './routes/catelogue.routes';
-import dotenv from 'dotenv';
-dotenv.config();
 const app = express();
 const Port = 2300;
 
