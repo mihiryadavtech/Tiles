@@ -4,6 +4,10 @@ import { AppDataSource } from '../dataBaseConnection';
 import { Admin } from '../entities/Admin.entity';
 import { Company } from '../entities/Company.entity';
 import { Catalogue } from '../entities/Catalogue.entity';
+import authenticateToken from '../middleware/auth';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+const saltRounds = 12;
 
 const errorFunction = (error: any) => {
   const errors = {
@@ -11,9 +15,16 @@ const errorFunction = (error: any) => {
     error: {
       message: error.message,
     },
-    message: ' Somekind Of Error',
+    message: 'Error has happened',
   };
   return errors;
+};
+
+const returnFunction = (_message: string) => {
+  const message = {
+    message: _message,
+  };
+  return message;
 };
 
 const adminRepository = AppDataSource.getRepository(Admin);
@@ -23,12 +34,13 @@ const catalogueRepository = AppDataSource.getRepository(Catalogue);
 
 const registerCompany = async (req: Request, res: Response) => {
   try {
-    const { adminId, subRoleId } = req.query;
+    // const { adminId, subRoleId } = req.query;
+
     const images = req?.files as Record<string, Express.Multer.File[]>;
     const logo = images?.logo?.[0];
     const cta = images?.cta?.[0];
 
-    // console.log(req.body);
+    console.log(req.body);
     console.log(images);
     // console.log(logo);
     // console.log(cta);
@@ -41,23 +53,35 @@ const registerCompany = async (req: Request, res: Response) => {
       address,
       latitude,
       longitude,
-      sponsered,
+      sponsored,
       verified,
       disabled,
       description,
       subrole,
       admin,
     } = req.body;
+    const companyExist = await companyRepository
+      .createQueryBuilder('subrole')
+      .select()
+      .where({ email: email })
+      .getOne();
 
+    if (companyExist) {
+      return res.status(400).json({ message: 'Company  Exist' });
+    }
     const subRoleExist = await subRoleRepository
       .createQueryBuilder('subrole')
       .select()
-      .where({ id: subRoleId })
+      .where({ id: subrole })
       .getRawOne();
 
     if (!subRoleExist) {
+      console.log(subRoleExist);
       return res.status(400).json({ message: "Subrole doesn't Exist" });
     }
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashPassword = await bcrypt.hash(password, salt);
+
     const registeredCompany = await companyRepository
       .createQueryBuilder()
       .insert()
@@ -67,18 +91,18 @@ const registerCompany = async (req: Request, res: Response) => {
         name: name,
         mobile: mobile,
         email: email,
-        password: password,
+        password: hashPassword,
         website: website,
         address: address,
         latitude: latitude,
         longitude: longitude,
-        sponsered: sponsered,
+        sponsored: sponsored,
         verified: verified,
         disabled: disabled,
         cta: cta,
         description: description,
         // admin: adminExist.admin_id,
-        // subrole: subRoleExist.subrole_id,
+        subrole: subRoleExist?.subrole_id,
       })
       .returning('*')
       .execute();
@@ -90,79 +114,129 @@ const registerCompany = async (req: Request, res: Response) => {
   }
 };
 
+const loginCompany = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+    const companyExist = await companyRepository
+      .createQueryBuilder()
+      .select()
+      .where({
+        email: email,
+      })
+      .getOne();
+
+    console.log(companyExist?.password);
+    if (!companyExist) {
+      return res.status(400).json(returnFunction("Company User doesn't exist"));
+    }
+    const hashPassword = companyExist?.password;
+    const correctPassword = await bcrypt.compare(password, hashPassword);
+    // console.log(correctPassword);
+    if (!correctPassword) {
+      return res.status(400).json(returnFunction('Enter the proper password'));
+    }
+
+    const token = jwt.sign(
+      { userId: companyExist?.id, role: 'company' },
+      process.env.TOKEN_KEY as string,
+      { expiresIn: '1h' }
+    );
+    // console.log(token);
+    // console.log(process.env.TOKEN_KEY);
+    return res
+      .status(200)
+      .json({ message: 'Company User login successfully', token: token });
+  } catch (error) {
+    const errors = errorFunction(error);
+    return res.status(400).json({ errors });
+  }
+};
+
+const getAllCompany = async (req: Request, res: Response) => {
+  try {
+    const user = req.app.get('user');
+    const isRole = user?.role;
+    // console.log(Boolean(isRole));
+
+    if (!(isRole === 'admin' || isRole === 'company')) {
+      return res.json({ message: 'User is unauthorized' });
+    }
+    const AllCompany = await companyRepository
+      .createQueryBuilder('company')
+      .select()
+      .getMany();
+
+    return res.status(200).json({ data: AllCompany });
+  } catch (error) {
+    const errors = errorFunction(error);
+    return res.status(400).json({ errors });
+  }
+};
 // Admin should be able to update user details name, profile photo, mobile, whatsapp number, email, country, state, city, role, subrole, gst_number and verification document(s), company name, company address
 
-// const updateUser = async (req: Request, res: Response) => {
-//   try {
-//     const { adminId, userId } = req.query;
-//     const images = req.files as Record<string, Express.Multer.File[]>;
-//     const profilePhoto = images.profilePhoto[0];
-//     const visitingCard = images.visitingCard[0];
-//     const verificationDoc = images.verificationDoc[0];
-//     const {
-//       name,
-//       mobile,
-//       waMobile,
-//       email,
-//       country,
-//       state,
-//       city,
-//       role,
-//       gstNumber,
-//       companyName,
-//       companyAddress,
-//       companyWebsite,
-//       docType,
-//       verified,
-//       disabled,
-//       meta,
-//     } = req.body;
-//     const adminExist = await adminRepository
-//       .createQueryBuilder('admin')
-//       .select()
-//       .where({ id: adminId })
-//       .getRawOne();
+const updateCompany = async (req: Request, res: Response) => {
+  try {
+    const user = req.app.get('user');
+    const isRole = user?.role;
+    console.log(user.userId);
 
-//     if (adminExist) {
-//       const updatedUser = await AppDataSource.createQueryBuilder()
+    if (!(isRole === 'admin' || isRole === 'company')) {
+      return res.json({ message: 'User is unauthorized' });
+    }
+    console.log('hhiiii');
+    const images = req?.files as Record<string, Express.Multer.File[]>;
+    const logo = images?.logo?.[0];
+    const cta = images?.cta?.[0];
+    const {
+      name,
+      mobile,
+      email,
+      website,
+      address,
+      latitude,
+      longitude,
+      sponsored,
+      verified,
+      disabled,
+      description,
+    } = req.body;
+    console.log(req.body);
+    const updatedRegisteredCompany = await AppDataSource.createQueryBuilder()
+      .update(Company)
+      .set({
+        logo: logo,
+        name: name,
+        mobile: mobile,
+        email: email,
+        website: website,
+        address: address,
+        latitude: latitude,
+        longitude: longitude,
+        sponsored: sponsored,
+        verified: verified,
+        disabled: disabled,
+        cta: cta,
+        description: description,
+      })
+      .where({ id: user?.userId })
+      .returning('*')
+      .execute();
+    return res.status(200).json({ data: updatedRegisteredCompany });
+  } catch (error) {
+    // console.log(error);
+    const errors = errorFunction(error);
+    return res.status(400).json({ errors });
+  }
+};
+// const updateLastseen = await userRepository;
+//         .createQueryBuilder('user')
 //         .update(User)
-//         .set({
-//           name: name,
-//           profilePhoto: profilePhoto,
-//           mobile: mobile,
-//           waMobile: waMobile,
-//           email: email,
-//           country: country,
-//           state: state,
-//           city: city,
-//           role: role,
-//           gstNumber: gstNumber,
-//           companyName: companyName,
-//           companyAddress: companyAddress,
-//           companyWebsite: companyWebsite,
-//           visitingCard: visitingCard,
-//           verificationDoc: verificationDoc,
-//           docType: docType,
-//           verified: verified,
-//           disabled: disabled,
-//           meta: meta,
-//         })
-//         .where({ id: userId })
+//         .set({ lastSeen: new Date() })
+//         .where({ id: id })
 //         .returning('*')
 //         .execute();
 
-//       res.status(200).json({ data: updatedUser.raw[0] });
-//     } else {
-//       res.status(400).json({ message: 'User is Unauthorized' });
-//     }
-//   } catch (error) {
-//     // console.log(error);
-//     const errors = errorFunction(error);
-//     res.status(400).json({ errors });
-//   }
-// };
-
-const deletecompany = async (req: Request, res: Response) => {
+const deleteCompany = async (req: Request, res: Response) => {
   try {
     const { adminId, companyId } = req.query;
     const adminExist = await adminRepository
@@ -357,7 +431,10 @@ const companyDeleteCatalogue = async (req: Request, res: Response) => {
 
 export {
   registerCompany,
-  deletecompany,
+  loginCompany,
+  getAllCompany,
+  updateCompany,
+  deleteCompany,
   companyCreateCatalogue,
   companyUpdateCatalogue,
   companyDeleteCatalogue,

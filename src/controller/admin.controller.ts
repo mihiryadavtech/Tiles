@@ -87,15 +87,16 @@ const loginAdmin = async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign(
-      { userId: adminExist?.id, role: 'Admin' },
+      { userId: adminExist?.id, role: 'admin' },
       process.env.TOKEN_KEY as string,
       { expiresIn: '1h' }
     );
     // console.log(token);
     // console.log(process.env.TOKEN_KEY);
 
+    console.log(res);
     return res
-      .status(400)
+      .status(200)
       .json({ message: 'User login successfully', token: token });
   } catch (error) {
     const errors = errorFunction(error);
@@ -106,10 +107,10 @@ const loginAdmin = async (req: Request, res: Response) => {
 const getAllAdmin = async (req: Request, res: Response) => {
   try {
     const user = req.app.get('user');
-    const isAdmin = user?.role;
-    console.log(Boolean(isAdmin));
+    const isRole = user?.role;
+    // console.log(Boolean(isRole));
 
-    if (!(isAdmin === 'Admin')) {
+    if (!(isRole === 'admin')) {
       return res.json({ message: 'User is unauthorized' });
     }
     const getAllAdmin = await adminRepository

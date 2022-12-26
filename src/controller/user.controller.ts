@@ -93,9 +93,9 @@ const updateUser = async (req: Request, res: Response) => {
   try {
     const { adminId, userId } = req.query;
     const images = req.files as Record<string, Express.Multer.File[]>;
-    const profilePhoto = images.profilePhoto[0];
-    const visitingCard = images.visitingCard[0];
-    const verificationDoc = images.verificationDoc[0];
+    const profilePhoto = images?.profilePhoto?.[0];
+    const visitingCard = images?.visitingCard?.[0];
+    const verificationDoc = images?.verificationDoc?.[0];
     const {
       name,
       mobile,
@@ -114,13 +114,14 @@ const updateUser = async (req: Request, res: Response) => {
       disabled,
       meta,
     } = req.body;
-    const adminExist = await adminRepository
-      .createQueryBuilder('admin')
-      .select()
-      .where({ id: adminId })
-      .getRawOne();
+    console.log(req.body);
+    // const adminExist = await adminRepository
+    //   .createQueryBuilder('admin')
+    //   .select()
+    //   .where({ id: adminId })
+    //   .getRawOne();
 
-    if (adminExist) {
+    // if (adminExist) {
       const updatedUser = await AppDataSource.createQueryBuilder()
         .update(User)
         .set({
@@ -148,10 +149,10 @@ const updateUser = async (req: Request, res: Response) => {
         .returning('*')
         .execute();
 
-      res.status(200).json({ data: updatedUser.raw[0] });
-    } else {
+    //   res.status(200).json({ data: updatedUser.raw[0] });
+    // } else {
       res.status(400).json({ message: 'User is Unauthorized' });
-    }
+    
   } catch (error) {
     // console.log(error);
     const errors = errorFunction(error);

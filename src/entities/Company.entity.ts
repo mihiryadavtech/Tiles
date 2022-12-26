@@ -56,7 +56,7 @@ export class Company extends BaseEntity {
   longitude: number;
 
   @Column({ name: 'sponsered', type: 'boolean' })
-  sponsered: boolean;
+  sponsored: boolean;
 
   @Column({ name: 'verified', type: 'boolean' })
   verified: boolean;

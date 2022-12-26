@@ -7,7 +7,7 @@ const authenticateToken = async (
   next: NextFunction
 ) => {
   try {
-    console.log('>>>>>>>>>>>','Inside authtoken');
+    console.log('>>>>>>>>>>>', 'Inside authtoken');
     const authenticationHeader = req?.headers?.['authorization'];
     const token = authenticationHeader && authenticationHeader?.split(' ')?.[1];
     if (!token) {
@@ -18,6 +18,7 @@ const authenticateToken = async (
     console.log(req.app.get('user'));
     return next();
   } catch (error) {
+    console.log(error);
     return res.status(400).json({ message: error.message });
   }
 };
