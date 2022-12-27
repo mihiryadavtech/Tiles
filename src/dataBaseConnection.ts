@@ -97,7 +97,7 @@ const AppDataSource = new DataSource({
     UserDealingCategory,
   ],
   migrations: ['src/migrations/**/*.ts'],
-  logging: true,
+  logging: false,
   synchronize: false,
 });
 

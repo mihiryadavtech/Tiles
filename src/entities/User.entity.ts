@@ -57,8 +57,8 @@ export class User extends BaseEntity {
   @Column({ name:'email',type: 'varchar', unique: true })
   email: string;
 
-  // @Column({ type: 'varchar' })
-  // password: string;
+  @Column({ type: 'varchar' })
+  password: string;
 
   @Column({ name:'country',type: 'varchar' })
   country: string;
@@ -127,8 +127,8 @@ export class User extends BaseEntity {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
 
-  // @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp' })
-  // deletedAt: Date;
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp' })
+  deletedAt?: Date;
 
   @ManyToOne(() => SubRole, (subRole) => subRole.user)
   subrole: SubRole;

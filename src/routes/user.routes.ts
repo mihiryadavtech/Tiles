@@ -93,6 +93,7 @@ router.get('/user', authenticateToken, getAllUser);
 
 router.patch(
   '/user',
+  authenticateToken,
   upload.fields([
     { name: 'profilePhoto', maxCount: 1 },
     { name: 'verificationDoc', maxCount: 2 },
@@ -100,7 +101,7 @@ router.patch(
   ]),
   updateUser
 );
-router.delete('/user', deleteUser);
+router.delete('/user', authenticateToken, deleteUser);
 
 router.post(
   '/user/catalogue',

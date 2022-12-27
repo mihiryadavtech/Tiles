@@ -91,7 +91,7 @@ const registerCompany = async (req: Request, res: Response) => {
         name: name,
         mobile: mobile,
         email: email,
-        // password: hashPassword,
+        password: hashPassword,
         website: website,
         address: address,
         latitude: latitude,
@@ -129,12 +129,12 @@ const loginCompany = async (req: Request, res: Response) => {
     if (!companyExist) {
       return res.status(400).json(returnFunction("Company User doesn't exist"));
     }
-    // const hashPassword = companyExist?.password;
-    // const correctPassword = await bcrypt.compare(password, hashPassword);
+    const hashPassword = companyExist?.password;
+    const correctPassword = await bcrypt.compare(password, hashPassword);
     // console.log(correctPassword);
-    // if (!correctPassword) {
-      // return res.status(400).json(returnFunction('Enter the proper password'));
-    // }
+    if (!correctPassword) {
+      return res.status(400).json(returnFunction('Enter the proper password'));
+    }
 
     const token = jwt.sign(
       { userId: companyExist?.id, role: 'company' },

@@ -40,9 +40,10 @@ const registerUser = async (req: Request, res: Response) => {
     const images = req?.files as Record<string, Express.Multer.File[]>;
     const profilePhoto = images?.profilePhoto?.[0];
     const visitingCard = images?.visitingCard?.[0];
-    const verificationDoc = images?.verificationDoc?.[0];
-    console.log(req.body);
-    console.log(images);
+    const verificationDoc = images?.verificationDoc;
+    console.log('[[[[[[[[[[[[', images);
+    // console.log(req.files);
+    console.log('/////////////////', verificationDoc);
     const {
       name,
       mobile,
@@ -63,7 +64,7 @@ const registerUser = async (req: Request, res: Response) => {
       meta,
       subrole,
     } = req.body;
-
+    console.log('++++++++++++++', req.body);
     const userExist = await userRepository
       .createQueryBuilder('user')
       .select()
@@ -85,7 +86,6 @@ const registerUser = async (req: Request, res: Response) => {
     }
     const salt = await bcrypt.genSalt(saltRounds);
     const hashPassword = await bcrypt.hash(password, salt);
-    console.log('>>>>>>>>>', Date());
     const createdUser = await userRepository
       .createQueryBuilder()
       .insert()
@@ -96,7 +96,7 @@ const registerUser = async (req: Request, res: Response) => {
         mobile: mobile,
         waMobile: waMobile,
         email: email,
-        // password: hashPassword,
+        password: hashPassword,
         country: country,
         state: state,
         city: city,
@@ -107,11 +107,12 @@ const registerUser = async (req: Request, res: Response) => {
         companyWebsite: companyWebsite,
         docType: docType,
         visitingCard: visitingCard,
+        //@ts-ignore
         verificationDoc: verificationDoc,
         verified: verified,
         disabled: disabled,
         meta: meta,
-        lastSeen: Date.now(),
+        lastSeen: new Date(),
         subrole: subrole,
       })
       .returning('*')
@@ -139,12 +140,12 @@ const loginUser = async (req: Request, res: Response) => {
     if (!userExist) {
       return res.status(400).json(returnFunction(" User doesn't exist"));
     }
-    // const hashPassword = userExist?.password;
-    // const correctPassword = await bcrypt.compare(password, hashPassword);
-    // // console.log(correctPassword);
-    // if (!correctPassword) {
-    //   return res.status(400).json(returnFunction('Enter the proper password'));
-    // }
+    const hashPassword = userExist?.password;
+    const correctPassword = await bcrypt.compare(password, hashPassword);
+    // console.log(correctPassword);
+    if (!correctPassword) {
+      return res.status(400).json(returnFunction('Enter the proper password'));
+    }
 
     const token = jwt.sign(
       { userId: userExist?.id, role: 'user' },
@@ -166,11 +167,21 @@ const loginUser = async (req: Request, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
   try {
-    const { adminId, userId } = req.query;
-    const images = req.files as Record<string, Express.Multer.File[]>;
+    const user = req.app.get('user');
+    const isRole = user?.role;
+    console.log(user);
+
+    if (!(isRole === 'admin' || isRole === 'user')) {
+      return res.json({ message: 'User is unauthorized' });
+    }
+
+    const images = req?.files as Record<string, Express.Multer.File[]>;
     const profilePhoto = images?.profilePhoto?.[0];
     const visitingCard = images?.visitingCard?.[0];
-    const verificationDoc = images?.verificationDoc?.[0];
+    const verificationDoc = images?.verificationDoc;
+    console.log('[[[[[[[[[[[[', images);
+    // console.log(req.files);
+    console.log('/////////////////', verificationDoc);
     const {
       name,
       mobile,
@@ -188,15 +199,9 @@ const updateUser = async (req: Request, res: Response) => {
       verified,
       disabled,
       meta,
+      subrole,
     } = req.body;
-    console.log(req.body);
-    // const adminExist = await adminRepository
-    //   .createQueryBuilder('admin')
-    //   .select()
-    //   .where({ id: adminId })
-    //   .getRawOne();
-
-    // if (adminExist) {
+    console.log('++++++++++++++', req.body);
     const updatedUser = await AppDataSource.createQueryBuilder()
       .update(User)
       .set({
@@ -214,50 +219,47 @@ const updateUser = async (req: Request, res: Response) => {
         companyAddress: companyAddress,
         companyWebsite: companyWebsite,
         visitingCard: visitingCard,
-        verificationDoc: verificationDoc,
         docType: docType,
+        verificationDoc: verificationDoc,
         verified: verified,
         disabled: disabled,
         meta: meta,
       })
-      .where({ id: userId })
+      .where({ id: user?.userId })
       .returning('*')
       .execute();
+    return res.status(200).json({ data: updatedUser?.raw?.[0] });
 
-    //   res.status(200).json({ data: updatedUser.raw[0] });
-    // } else {
     res.status(400).json({ message: 'User is Unauthorized' });
   } catch (error) {
     // console.log(error);
     const errors = errorFunction(error);
-    res.status(400).json({ errors });
+    return res.status(400).json({ errors });
   }
 };
 
 const deleteUser = async (req: Request, res: Response) => {
   try {
-    const { adminId, userId } = req.query;
-    const adminExist = await adminRepository
-      .createQueryBuilder('admin')
-      .select()
-      .where({ id: adminId })
-      .getRawOne();
-    if (adminExist) {
-      const deletedUser = await userRepository
-        .createQueryBuilder('user')
-        .delete()
-        .from(User)
-        .where({ id: userId })
-        .returning('*')
-        .execute();
+    const user = req.app.get('user');
+    const isRole = user?.role;
+    // console.log(Boolean(isRole));
 
-      res.status(201).json({ data: deletedUser.raw[0] });
-    } else {
-      res.status(400).json({ message: 'User is Unauthorized' });
+    if (!(isRole === 'admin' || isRole === 'user')) {
+      return res.json({ message: 'User is unauthorized' });
     }
+
+    const deletedUser = await userRepository
+      .createQueryBuilder('user')
+      .softDelete()
+      .from(User)
+      .where({ id: user.userId })
+      .returning('*')
+      .execute();
+    console.log(deletedUser);
+    return res.status(201).json({ message: 'User is deleted' });
   } catch (error) {
     const errors = errorFunction(error);
-    res.status(400).json({ errors });
+    return res.status(400).json({ errors });
   }
 };
 
@@ -265,34 +267,22 @@ const deleteUser = async (req: Request, res: Response) => {
 
 const getAllUser = async (req: Request, res: Response) => {
   try {
-    const { id } = req.query;
+    const user = req.app.get('user');
+    const isRole = user?.role;
+    // console.log(Boolean(isRole));
 
-    if (id?.length && id.length >= 1) {
-      const updateLastseen = await userRepository
-        .createQueryBuilder('user')
-        .update(User)
-        .set({ lastSeen: new Date() })
-        .where({ id: id })
-        .returning('*')
-        .execute();
-      const getUser = await userRepository
-        .createQueryBuilder('user')
-        .select()
-        .where({ id: id })
-        .getRawOne();
-      res.status(200).json({ data: getUser });
-    } else if (id === '') {
-      res.status(400).json({ message: 'Enter proper Id' });
-    } else {
-      const getUser = await userRepository
-        .createQueryBuilder('user')
-        .select()
-        .getRawMany();
-      res.status(200).json({ data: getUser });
+    if (!(isRole === 'admin' || isRole === 'user')) {
+      return res.json({ message: 'User is unauthorized' });
     }
+    const AllUser = await userRepository
+      .createQueryBuilder('company')
+      .select()
+      .getMany();
+    // console.log(AllUser);
+    return res.status(200).json({ data: AllUser });
   } catch (error) {
     const errors = errorFunction(error);
-    res.status(400).json({ errors });
+    return res.status(400).json({ errors });
   }
 };
 //
