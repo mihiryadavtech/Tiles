@@ -9,6 +9,6 @@ export class companypassword21671692367160 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE "company" Drop "password"  `);
+    await queryRunner.query(`ALTER TABLE "company" DROP "password"  `);
   }
 }

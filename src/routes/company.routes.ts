@@ -18,7 +18,7 @@ import path from 'path';
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/images');
+    cb(null, 'uploads/company');
   },
   filename: (req, file, cb) => {
     return cb(
@@ -34,7 +34,7 @@ router.post(
   '/company/signup',
   upload.fields([
     { name: 'logo', maxCount: 1 },
-    { name: 'cta', maxCount: 1 },
+    { name: 'cta', maxCount: 2 },
   ]),
   [
     body('logo', 'select an Image '),
@@ -89,15 +89,6 @@ router.post(
   registerCompany
 );
 
-// router.patch(
-//   '/user',
-//   upload.fields([
-//     { name: 'profilePhoto', maxCount: 1 },
-//     { name: 'verificationDoc', maxCount: 1 },
-//     { name: 'visitingCard', maxCount: 1 },
-//   ]),
-//   updateUser
-// );
 router.post('/company/login', loginCompany);
 router.get('/company', authenticateToken, getAllCompany);
 router.patch(

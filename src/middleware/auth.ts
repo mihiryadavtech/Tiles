@@ -8,6 +8,7 @@ const authenticateToken = async (
 ) => {
   try {
     console.log('>>>>>>>>>>>', 'Inside authtoken');
+    console.log(req.headers);
     const authenticationHeader = req?.headers?.['authorization'];
     const token = authenticationHeader && authenticationHeader?.split(' ')?.[1];
     if (!token) {

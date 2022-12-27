@@ -1,11 +1,11 @@
 import file from 'src/interfaces/file';
 enum Role {
-  BUYER = 'Buyer',
-  SELLER = 'Seller',
+  BUYER = 1,
+  SELLER = 2,
 }
 enum Doc {
-  ADHAAR = 'Aadhar',
-  PAN_CARD = 'PanCard',
+  ADHAAR = 1,
+  PAN_CARD = 2,
 }
 
 import {
@@ -42,34 +42,34 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 150 })
+  @Column({name:'name', type: 'varchar', length: 150 })
   name: string;
 
   @Column({ name: 'profile_photo', type: 'jsonb', nullable: true })
   profilePhoto: file;
 
-  @Column({ type: 'varchar', length: 15, unique: true })
+  @Column({ name:'mobile',type: 'varchar', length: 15, unique: true })
   mobile: number;
 
   @Column({ name: 'wa_mobile', type: 'varchar', length: 15, nullable: true })
   waMobile: number;
 
-  @Column({ type: 'varchar', unique: true })
+  @Column({ name:'email',type: 'varchar', unique: true })
   email: string;
 
-  @Column({ type: 'varchar' })
-  password: string;
+  // @Column({ type: 'varchar' })
+  // password: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ name:'country',type: 'varchar' })
   country: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ name:'state',type: 'varchar' })
   state: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ name:'city',type: 'varchar' })
   city: string;
 
-  @Column({ type: 'enum', enum: Role, default: Role.BUYER })
+  @Column({ name:'role',type: 'enum', enum: Role, default: Role.BUYER })
   role: Role;
 
   @Column({ name: 'gst_number', type: 'varchar', length: 15, nullable: true })
@@ -109,16 +109,16 @@ export class User extends BaseEntity {
   @Column({ name: 'verification_doc', type: 'jsonb', nullable: true })
   verificationDoc: file;
 
-  @Column({ type: 'boolean' })
+  @Column({ name: 'verified',type: 'boolean' })
   verified: boolean;
 
-  @Column({ type: 'boolean' })
+  @Column({ name: 'disabled',type: 'boolean' })
   disabled: boolean;
 
-  @Column({ type: 'timestamptz', name: 'last_seen' })
+  @Column({ name: 'last_seen',type: 'timestamp',  })
   lastSeen: Date;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ name :'meta',type: 'jsonb', nullable: true })
   meta: {};
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
@@ -127,8 +127,8 @@ export class User extends BaseEntity {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp' })
-  deletedAt: Date;
+  // @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp' })
+  // deletedAt: Date;
 
   @ManyToOne(() => SubRole, (subRole) => subRole.user)
   subrole: SubRole;

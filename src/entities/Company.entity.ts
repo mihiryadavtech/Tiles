@@ -52,10 +52,10 @@ export class Company extends BaseEntity {
   @Column({ name: 'latitude', type: 'varchar', nullable: true })
   latitude: number;
 
-  @Column({ name: 'logitude', type: 'varchar', nullable: true })
+  @Column({ name: 'longitude', type: 'varchar', nullable: true })
   longitude: number;
 
-  @Column({ name: 'sponsered', type: 'boolean' })
+  @Column({ name: 'sponsored', type: 'boolean' })
   sponsored: boolean;
 
   @Column({ name: 'verified', type: 'boolean' })

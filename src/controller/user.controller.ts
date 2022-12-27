@@ -4,6 +4,10 @@ import { User } from '../entities/User.Entity';
 import { AppDataSource } from '../dataBaseConnection';
 import { Admin } from '../entities/Admin.entity';
 import { Catalogue } from '../entities/Catalogue.entity';
+import { subroleRouter } from 'src/routes/subrole.routes';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+const saltRounds = 12;
 
 // Admin should be able to add user
 // Admin should be able to update user details name, profile photo, mobile, whatsapp number, email, country, state, city, role, subrole, gst_number and verification document(s), company name, company address
@@ -19,6 +23,12 @@ const errorFunction = (error: any) => {
   };
   return errors;
 };
+const returnFunction = (_message: string) => {
+  const message = {
+    message: _message,
+  };
+  return message;
+};
 
 const adminRepository = AppDataSource.getRepository(Admin);
 const catalogueRepository = AppDataSource.getRepository(Catalogue);
@@ -27,16 +37,18 @@ const userRepository = AppDataSource.getRepository(User);
 
 const registerUser = async (req: Request, res: Response) => {
   try {
-    const images = req.files as Record<string, Express.Multer.File[]>;
-    const profilePhoto = images.profilePhoto[0];
-    const visitingCard = images.visitingCard[0];
-    const verificationDoc = images.verificationDoc[0];
-
+    const images = req?.files as Record<string, Express.Multer.File[]>;
+    const profilePhoto = images?.profilePhoto?.[0];
+    const visitingCard = images?.visitingCard?.[0];
+    const verificationDoc = images?.verificationDoc?.[0];
+    console.log(req.body);
+    console.log(images);
     const {
       name,
       mobile,
       waMobile,
       email,
+      password,
       country,
       state,
       city,
@@ -49,9 +61,31 @@ const registerUser = async (req: Request, res: Response) => {
       verified,
       disabled,
       meta,
-      subroleId,
+      subrole,
     } = req.body;
 
+    const userExist = await userRepository
+      .createQueryBuilder('user')
+      .select()
+      .where({ email: email })
+      .getOne();
+
+    if (userExist) {
+      return res.status(400).json({ message: 'User Already Exist' });
+    }
+    const subRoleExist = await subRoleRepository
+      .createQueryBuilder('subrole')
+      .select()
+      .where({ id: subrole })
+      .getRawOne();
+
+    if (!subRoleExist) {
+      console.log(subRoleExist);
+      return res.status(400).json({ message: "Subrole doesn't Exist" });
+    }
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashPassword = await bcrypt.hash(password, salt);
+    console.log('>>>>>>>>>', Date());
     const createdUser = await userRepository
       .createQueryBuilder()
       .insert()
@@ -62,28 +96,69 @@ const registerUser = async (req: Request, res: Response) => {
         mobile: mobile,
         waMobile: waMobile,
         email: email,
+        // password: hashPassword,
         country: country,
         state: state,
         city: city,
+        role: role,
         gstNumber: gstNumber,
         companyName: companyName,
         companyAddress: companyAddress,
         companyWebsite: companyWebsite,
+        docType: docType,
         visitingCard: visitingCard,
         verificationDoc: verificationDoc,
         verified: verified,
         disabled: disabled,
         meta: meta,
         lastSeen: Date.now(),
-        subrole: subroleId,
+        subrole: subrole,
       })
       .returning('*')
       .execute();
-    res.status(200).json({ data: createdUser.raw[0] });
+    return res.status(200).json({ data: createdUser?.raw?.[0] });
   } catch (error) {
     console.log(error);
     const errors = errorFunction(error);
-    res.status(400).json({ errors });
+    return res.status(400).json({ errors });
+  }
+};
+
+const loginUser = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+    const userExist = await userRepository
+      .createQueryBuilder()
+      .select()
+      .where({
+        email: email,
+      })
+      .getOne();
+
+    // console.log(userExist?.password);
+    if (!userExist) {
+      return res.status(400).json(returnFunction(" User doesn't exist"));
+    }
+    // const hashPassword = userExist?.password;
+    // const correctPassword = await bcrypt.compare(password, hashPassword);
+    // // console.log(correctPassword);
+    // if (!correctPassword) {
+    //   return res.status(400).json(returnFunction('Enter the proper password'));
+    // }
+
+    const token = jwt.sign(
+      { userId: userExist?.id, role: 'user' },
+      process.env.TOKEN_KEY as string,
+      { expiresIn: '1h' }
+    );
+    console.log(token);
+    // console.log(process.env.TOKEN_KEY);
+    return res
+      .status(200)
+      .json({ message: 'User login successfully', token: token });
+  } catch (error) {
+    const errors = errorFunction(error);
+    return res.status(400).json({ errors });
   }
 };
 
@@ -122,37 +197,36 @@ const updateUser = async (req: Request, res: Response) => {
     //   .getRawOne();
 
     // if (adminExist) {
-      const updatedUser = await AppDataSource.createQueryBuilder()
-        .update(User)
-        .set({
-          name: name,
-          profilePhoto: profilePhoto,
-          mobile: mobile,
-          waMobile: waMobile,
-          email: email,
-          country: country,
-          state: state,
-          city: city,
-          role: role,
-          gstNumber: gstNumber,
-          companyName: companyName,
-          companyAddress: companyAddress,
-          companyWebsite: companyWebsite,
-          visitingCard: visitingCard,
-          verificationDoc: verificationDoc,
-          docType: docType,
-          verified: verified,
-          disabled: disabled,
-          meta: meta,
-        })
-        .where({ id: userId })
-        .returning('*')
-        .execute();
+    const updatedUser = await AppDataSource.createQueryBuilder()
+      .update(User)
+      .set({
+        name: name,
+        profilePhoto: profilePhoto,
+        mobile: mobile,
+        waMobile: waMobile,
+        email: email,
+        country: country,
+        state: state,
+        city: city,
+        role: role,
+        gstNumber: gstNumber,
+        companyName: companyName,
+        companyAddress: companyAddress,
+        companyWebsite: companyWebsite,
+        visitingCard: visitingCard,
+        verificationDoc: verificationDoc,
+        docType: docType,
+        verified: verified,
+        disabled: disabled,
+        meta: meta,
+      })
+      .where({ id: userId })
+      .returning('*')
+      .execute();
 
     //   res.status(200).json({ data: updatedUser.raw[0] });
     // } else {
-      res.status(400).json({ message: 'User is Unauthorized' });
-    
+    res.status(400).json({ message: 'User is Unauthorized' });
   } catch (error) {
     // console.log(error);
     const errors = errorFunction(error);
@@ -357,6 +431,7 @@ const userDeleteCatalogue = async (req: Request, res: Response) => {
 
 export {
   registerUser,
+  loginUser,
   getAllUser,
   updateUser,
   deleteUser,

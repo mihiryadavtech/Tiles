@@ -61,7 +61,7 @@ const registerCompany = async (req: Request, res: Response) => {
       admin,
     } = req.body;
     const companyExist = await companyRepository
-      .createQueryBuilder('subrole')
+      .createQueryBuilder('company')
       .select()
       .where({ email: email })
       .getOne();
@@ -91,7 +91,7 @@ const registerCompany = async (req: Request, res: Response) => {
         name: name,
         mobile: mobile,
         email: email,
-        password: hashPassword,
+        // password: hashPassword,
         website: website,
         address: address,
         latitude: latitude,
@@ -125,16 +125,16 @@ const loginCompany = async (req: Request, res: Response) => {
       })
       .getOne();
 
-    console.log(companyExist?.password);
+    // console.log(companyExist?.password);
     if (!companyExist) {
       return res.status(400).json(returnFunction("Company User doesn't exist"));
     }
-    const hashPassword = companyExist?.password;
-    const correctPassword = await bcrypt.compare(password, hashPassword);
+    // const hashPassword = companyExist?.password;
+    // const correctPassword = await bcrypt.compare(password, hashPassword);
     // console.log(correctPassword);
-    if (!correctPassword) {
-      return res.status(400).json(returnFunction('Enter the proper password'));
-    }
+    // if (!correctPassword) {
+      // return res.status(400).json(returnFunction('Enter the proper password'));
+    // }
 
     const token = jwt.sign(
       { userId: companyExist?.id, role: 'company' },
@@ -165,7 +165,7 @@ const getAllCompany = async (req: Request, res: Response) => {
       .createQueryBuilder('company')
       .select()
       .getMany();
-
+    console.log(AllCompany);
     return res.status(200).json({ data: AllCompany });
   } catch (error) {
     const errors = errorFunction(error);
@@ -183,7 +183,7 @@ const updateCompany = async (req: Request, res: Response) => {
     if (!(isRole === 'admin' || isRole === 'company')) {
       return res.json({ message: 'User is unauthorized' });
     }
-    console.log('hhiiii');
+    console.log('>>>>>>>>>', 'hiiii');
     const images = req?.files as Record<string, Express.Multer.File[]>;
     const logo = images?.logo?.[0];
     const cta = images?.cta?.[0];
@@ -201,7 +201,7 @@ const updateCompany = async (req: Request, res: Response) => {
       description,
     } = req.body;
     console.log(req.body);
-    const updatedRegisteredCompany = await AppDataSource.createQueryBuilder()
+    const updatedCompany = await AppDataSource.createQueryBuilder()
       .update(Company)
       .set({
         logo: logo,
@@ -221,7 +221,7 @@ const updateCompany = async (req: Request, res: Response) => {
       .where({ id: user?.userId })
       .returning('*')
       .execute();
-    return res.status(200).json({ data: updatedRegisteredCompany });
+    return res.status(200).json({ data: updatedCompany?.raw?.[0] });
   } catch (error) {
     // console.log(error);
     const errors = errorFunction(error);

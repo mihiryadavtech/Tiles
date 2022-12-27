@@ -94,7 +94,7 @@ const loginAdmin = async (req: Request, res: Response) => {
     // console.log(token);
     // console.log(process.env.TOKEN_KEY);
 
-    console.log(res);
+    // console.log(res);
     return res
       .status(200)
       .json({ message: 'User login successfully', token: token });
