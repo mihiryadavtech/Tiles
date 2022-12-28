@@ -1,8 +1,8 @@
 import file from 'src/interfaces/file';
 enum Status {
-  APPROVED = 'Approved',
-  REJECTED = 'Rejected',
-  INREVIEW = 'InReview',
+  INREVIEW = 0,
+  APPROVED = 1,
+  REJECTED = 2,
 }
 import {
   Entity,

@@ -28,7 +28,6 @@ const adminRepository = AppDataSource.getRepository(Admin);
 const createAdmin = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
-    console.log(req.body);
     const adminExist = await adminRepository
       .createQueryBuilder()
       .select()
@@ -36,28 +35,26 @@ const createAdmin = async (req: Request, res: Response) => {
         email: email,
       })
       .getOne();
-    console.log(adminExist);
-    if (!adminExist) {
-      const salt = await bcrypt.genSalt(saltRounds);
-      const hashPassword = await bcrypt.hash(password, salt);
+    if (adminExist)
+      return res.status(400).json(returnFunction('Admin already exists'));
 
-      const createdAdmin = await adminRepository
-        .createQueryBuilder()
-        .insert()
-        .into(Admin)
-        .values({ name: name, email: email, password: hashPassword })
-        .returning('id,name,email')
-        .execute();
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashPassword = await bcrypt.hash(password, salt);
 
-      const token = jwt.sign(
-        { userId: createdAdmin?.raw?.[0]?.id, role: 'Admin' },
-        process.env.TOKEN_KEY as string,
-        { expiresIn: '1h' }
-      );
-      // console.log(token);
-      return res.status(200).json({ data: createdAdmin?.raw?.[0] });
-    }
-    return res.status(400).json(returnFunction('User already exist'));
+    const createdAdmin = await adminRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Admin)
+      .values({ name: name, email: email, password: hashPassword })
+      .returning('id,name,email')
+      .execute();
+
+    const token = jwt.sign(
+      { userId: createdAdmin?.raw?.[0]?.id, role: 'Admin' },
+      process.env.TOKEN_KEY as string,
+      { expiresIn: '1h' }
+    );
+    return res.status(200).json({ data: createdAdmin?.raw?.[0] });
   } catch (error) {
     const errors = errorFunction(error);
     return res.status(400).json({ errors });

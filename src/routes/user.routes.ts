@@ -5,7 +5,6 @@ import {
   registerUser,
   updateUser,
   deleteUser,
-  userCreateCatalogue,
   userDeleteCatalogue,
   userUpdateCatalogue,
   loginUser,
@@ -13,6 +12,8 @@ import {
 import multer from 'multer';
 import path from 'path';
 import authenticateToken from '../middleware/auth';
+
+const router = Router();
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/user');
@@ -25,7 +26,6 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage: storage });
-const router = Router();
 
 router.post(
   '/user/signup',
@@ -103,14 +103,11 @@ router.patch(
 );
 router.delete('/user', authenticateToken, deleteUser);
 
-router.post(
-  '/user/catalogue',
-  upload.fields([
-    { name: 'pdf', maxCount: 1 },
-    { name: 'previewImage', maxCount: 1 },
-  ]),
-  userCreateCatalogue
-);
+//
+//
+//
+//
+
 
 router.patch(
   '/user/catalogue',

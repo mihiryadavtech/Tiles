@@ -5,6 +5,7 @@ import { AppDataSource } from '../dataBaseConnection';
 import { Admin } from '../entities/Admin.entity';
 import { Catalogue } from '../entities/Catalogue.entity';
 import { subroleRouter } from 'src/routes/subrole.routes';
+import cron, { schedule } from 'node-cron';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 const saltRounds = 12;
@@ -19,7 +20,7 @@ const errorFunction = (error: any) => {
     error: {
       message: error.message,
     },
-    message: ' Somekind Of Error',
+    message: 'Error has Occurred',
   };
   return errors;
 };
@@ -65,59 +66,62 @@ const registerUser = async (req: Request, res: Response) => {
       subrole,
     } = req.body;
     console.log('++++++++++++++', req.body);
+    console.log(typeof email);
     const userExist = await userRepository
-      .createQueryBuilder('user')
-      .select()
-      .where({ email: email })
-      .getOne();
-
-    if (userExist) {
-      return res.status(400).json({ message: 'User Already Exist' });
-    }
-    const subRoleExist = await subRoleRepository
-      .createQueryBuilder('subrole')
-      .select()
-      .where({ id: subrole })
-      .getRawOne();
-
-    if (!subRoleExist) {
-      console.log(subRoleExist);
-      return res.status(400).json({ message: "Subrole doesn't Exist" });
-    }
-    const salt = await bcrypt.genSalt(saltRounds);
-    const hashPassword = await bcrypt.hash(password, salt);
-    const createdUser = await userRepository
       .createQueryBuilder()
-      .insert()
-      .into(User)
-      .values({
-        name: name,
-        profilePhoto: profilePhoto,
-        mobile: mobile,
-        waMobile: waMobile,
+      .select()
+      .where({
         email: email,
-        password: hashPassword,
-        country: country,
-        state: state,
-        city: city,
-        role: role,
-        gstNumber: gstNumber,
-        companyName: companyName,
-        companyAddress: companyAddress,
-        companyWebsite: companyWebsite,
-        docType: docType,
-        visitingCard: visitingCard,
-        //@ts-ignore
-        verificationDoc: verificationDoc,
-        verified: verified,
-        disabled: disabled,
-        meta: meta,
-        lastSeen: new Date(),
-        subrole: subrole,
       })
-      .returning('*')
-      .execute();
-    return res.status(200).json({ data: createdUser?.raw?.[0] });
+      .getOne();
+    console.log('userExist>>>>>>>>', userExist);
+    if (!userExist) {
+      const subRoleExist = await subRoleRepository
+        .createQueryBuilder('subrole')
+        .select()
+        .where({ id: subrole })
+        .getRawOne();
+
+      if (!subRoleExist) {
+        console.log(subRoleExist);
+        return res.status(400).json({ message: "Subrole doesn't Exist" });
+      }
+      const salt = await bcrypt.genSalt(saltRounds);
+      const hashPassword = await bcrypt.hash(password, salt);
+      const createdUser = await userRepository
+        .createQueryBuilder()
+        .insert()
+        .into(User)
+        .values({
+          name: name,
+          profilePhoto: profilePhoto,
+          mobile: mobile,
+          waMobile: waMobile,
+          email: email,
+          password: hashPassword,
+          country: country,
+          state: state,
+          city: city,
+          role: role,
+          gstNumber: gstNumber,
+          companyName: companyName,
+          companyAddress: companyAddress,
+          companyWebsite: companyWebsite,
+          docType: docType,
+          visitingCard: visitingCard,
+          //@ts-ignore
+          verificationDoc: verificationDoc,
+          verified: verified,
+          disabled: disabled,
+          meta: meta,
+          lastSeen: new Date(),
+          subrole: subrole,
+        })
+        .returning('*')
+        .execute();
+      return res.status(200).json({ data: createdUser?.raw?.[0] });
+    }
+    return res.status(400).json({ message: 'User Already Exist' });
   } catch (error) {
     console.log(error);
     const errors = errorFunction(error);
@@ -256,6 +260,29 @@ const deleteUser = async (req: Request, res: Response) => {
       .returning('*')
       .execute();
     console.log(deletedUser);
+
+    const task = cron.schedule(
+      '*/30 * * * * * ',
+      async () => {
+        try {
+          console.log('Running Before Now');
+          const deletedUserCron = await userRepository
+            .createQueryBuilder('user')
+            .delete()
+            .from(User)
+            .where('deletedAt is not null')
+            .returning('*')
+            .execute();
+          console.log(deletedUserCron);
+          console.log('Running After Now');
+        } catch (error) {
+          console.log('>>>>>>>>>>>>>>', error);
+        }
+      },
+      { scheduled: false }
+    );
+    task.start();
+
     return res.status(201).json({ message: 'User is deleted' });
   } catch (error) {
     const errors = errorFunction(error);
@@ -278,7 +305,25 @@ const getAllUser = async (req: Request, res: Response) => {
       .createQueryBuilder('company')
       .select()
       .getMany();
-    // console.log(AllUser);
+    console.log(AllUser);
+
+    let allUserWithUrl = AllUser;
+    const urlSend = allUserWithUrl;
+    for (let index = 0; index < urlSend.length; index++) {
+      const element = urlSend[index];
+      const profilePhoto = element?.profilePhoto;
+      const profilePhotoUrlImage = `http://localhost:8000/api/v1/image/${profilePhoto?.filename}`;
+      const visitingCard = element?.visitingCard;
+      const visitingCardUrlImage = `http://localhost:8000/api/v1/image/${visitingCard?.filename}`;
+      const verificationDoc = element?.verificationDoc;
+      // for (let index = 0; index < verificationDoc; index++) {
+
+      // }
+      console.log(verificationDoc);
+      console.log('>>>>>>>>>>', profilePhotoUrlImage);
+      console.log('>>>>>>>>>>', visitingCardUrlImage);
+    }
+
     return res.status(200).json({ data: AllUser });
   } catch (error) {
     const errors = errorFunction(error);
@@ -293,54 +338,6 @@ const getAllUser = async (req: Request, res: Response) => {
 //
 //
 //
-const userCreateCatalogue = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.query;
-    const files = req.files as Record<string, Express.Multer.File[]>;
-    const pdf = files.pdf[0];
-    const previewImage = files.previewImage[0];
-
-    // console.log(req.body);
-    // console.log(req.files);
-    // console.log(pdf);
-    // console.log(previewImage);
-
-    const { name, description, isPrivate, status, editCount } = req.body;
-
-    const userExist = await userRepository
-      .createQueryBuilder('user')
-      .select()
-      .where({ id: userId })
-      .getRawOne();
-
-    if (userExist) {
-      const createdCatalogue = await catalogueRepository
-        .createQueryBuilder('catalogue')
-        .insert()
-        .into(Catalogue)
-        .values({
-          name: name,
-          pdf: pdf,
-          previewImage: previewImage,
-          description: description,
-          isPrivate: isPrivate,
-          status: status,
-          editCount: editCount,
-          userOwner: userExist.user_id,
-        })
-        .returning('*')
-        .execute();
-      res.status(200).json({ data: createdCatalogue.raw[0] });
-    } else {
-      res.status(400).json('User not Exist');
-    }
-  } catch (error) {
-    console.log(error);
-    const errors = errorFunction(error);
-    res.status(400).json({ errors });
-  }
-};
-
 const userUpdateCatalogue = async (req: Request, res: Response) => {
   try {
     const { userId, catalogueId } = req.query;
@@ -425,7 +422,6 @@ export {
   getAllUser,
   updateUser,
   deleteUser,
-  userCreateCatalogue,
   userUpdateCatalogue,
   userDeleteCatalogue,
 };
