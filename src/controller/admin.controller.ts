@@ -17,7 +17,7 @@ const errorFunction = (error: any) => {
   return errors;
 };
 
-const returnFunction = (_message: string) => {
+const messageFunction = (_message: string) => {
   const message = {
     message: _message,
   };
@@ -38,7 +38,7 @@ const createAdmin = async (req: Request, res: Response) => {
       })
       .getOne();
     if (adminExist)
-      return res.status(400).json(returnFunction('Admin already exists'));
+      return res.status(400).json(messageFunction('Admin already exists'));
 
     const salt = await bcrypt.genSalt(saltRounds);
     const hashPassword = await bcrypt.hash(password, salt);
@@ -58,7 +58,7 @@ const createAdmin = async (req: Request, res: Response) => {
     );
     return res
       .status(200)
-      .json({ message: 'User SignUp successfully', token: token });
+      .json(messageFunction('Admin is created successfully '));
   } catch (error) {
     const errors = errorFunction(error);
     return res.status(400).json({ errors });
@@ -77,13 +77,13 @@ const loginAdmin = async (req: Request, res: Response) => {
       .getOne();
 
     if (!adminExist) {
-      return res.status(400).json(returnFunction("User doesn't exist"));
+      return res.status(400).json(messageFunction("Admin doesn't Exist "));
     }
     const hashPassword = adminExist?.password;
     const correctPassword = await bcrypt.compare(password, hashPassword);
 
     if (!correctPassword) {
-      return res.status(400).json(returnFunction('Enter the proper password'));
+      return res.status(400).json(messageFunction('Enter a proper Password'));
     }
 
     const token = jwt.sign(

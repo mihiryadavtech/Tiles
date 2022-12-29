@@ -15,7 +15,7 @@ const errorFunction = (error: any) => {
   };
   return errors;
 };
-const returnFunction = (_message: string) => {
+const messageFunction = (_message: string) => {
   const message = {
     message: _message,
   };
@@ -32,10 +32,12 @@ const userRepository = AppDataSource.getRepository(User);
 const createCatalogue = async (req: Request, res: Response) => {
   try {
     const user = req.app.get('user');
+    if (!user) {
+      return res.status(400).json(messageFunction("User doesn't Exist"));
+    }
     const isRole = user?.role;
-
     if (!(isRole === 'company' || isRole === 'user')) {
-      return res.json({ message: 'User is unauthorized' });
+      return res.status(400).json(messageFunction('User is unauthorized'));
     }
 
     const files = req?.files as Record<string, Express.Multer.File[]>;
@@ -70,10 +72,11 @@ const createCatalogue = async (req: Request, res: Response) => {
       })
       .returning('*')
       .execute();
-    return res.status(200).json({ data: createdCatalogue?.raw?.[0] });
+    return res
+      .status(200)
+      .json(messageFunction('Catalogue is created successfully '));
   } catch (error) {
-    const errors = errorFunction(error);
-    return res.status(400).json({ errors });
+    return res.status(400).json(errorFunction(error));
   }
 };
 
@@ -85,7 +88,7 @@ const updateCatalogue = async (req: Request, res: Response) => {
     const isRole = user?.role;
 
     if (!(isRole === 'company' || isRole === 'user')) {
-      return res.json({ message: 'User is unauthorized' });
+      return res.status(400).json(messageFunction('User is unauthorized'));
     }
 
     const files = req?.files as Record<string, Express.Multer.File[]>;
@@ -114,11 +117,12 @@ const updateCatalogue = async (req: Request, res: Response) => {
         .execute();
 
       if (!updatedCatalogue?.affected) {
-        return res.status(400).json({ message: 'Enter proper catalogueId' });
+        return res
+          .status(400)
+          .json(messageFunction("CatalogueId doesn't belong to you "));
       }
       return res.status(200).json({ data: updatedCatalogue?.raw?.[0] });
     } else {
-
       const updatedCatalogue = await catalogueRepository
         .createQueryBuilder()
         .update(Catalogue)
@@ -136,9 +140,11 @@ const updateCatalogue = async (req: Request, res: Response) => {
         .andWhere({ userOwner: user?.userId })
         .returning('*')
         .execute();
-
+      console.log(updatedCatalogue);
       if (!updatedCatalogue?.affected) {
-        return res.status(400).json({ message: 'Enter proper catalogueId' });
+        return res
+          .status(400)
+          .json(messageFunction("CatalogueId doesn't belong to you "));
       }
       return res.status(200).json({ data: updatedCatalogue?.raw?.[0] });
     }
@@ -154,7 +160,7 @@ const getAllCatalogue = async (req: Request, res: Response) => {
     const isRole = user?.role;
 
     if (!(isRole === 'company' || isRole === 'user' || isRole === 'admin')) {
-      return res.json({ message: 'User is unauthorized' });
+      return res.status(400).json(messageFunction('User is unauthorized'));
     }
 
     const getAllCatalogue = await catalogueRepository
@@ -164,6 +170,7 @@ const getAllCatalogue = async (req: Request, res: Response) => {
         isPrivate: false,
       })
       .getMany();
+
     return res.status(200).json({ data: getAllCatalogue });
   } catch (error) {
     const errors = errorFunction(error);
@@ -178,7 +185,7 @@ const deleteCatalogue = async (req: Request, res: Response) => {
     const isRole = user?.role;
 
     if (!(isRole === 'company' || isRole === 'user')) {
-      return res.json({ message: 'User is unauthorized' });
+      return res.status(400).json(messageFunction('User is unauthorized'));
     }
     const { catalogueId } = req.body;
 
@@ -194,11 +201,13 @@ const deleteCatalogue = async (req: Request, res: Response) => {
         .execute();
 
       if (!deletedCatalogue?.affected) {
-        return res.status(400).json({ message: 'Enter proper catalogueId' });
+        return res
+          .status(400)
+          .json(messageFunction("CatalogueId doesn't own by you "));
       }
       return res
         .status(200)
-        .json({ message: 'Catalogue deleted successfully' });
+        .json(messageFunction('Catalogue deleted successfully'));
     } else {
       const deletedCatalogue = await catalogueRepository
         .createQueryBuilder()
@@ -211,11 +220,13 @@ const deleteCatalogue = async (req: Request, res: Response) => {
         .returning('*')
         .execute();
       if (!deletedCatalogue?.affected) {
-        return res.status(400).json({ message: 'Enter proper catalogueId' });
+        return res
+          .status(400)
+          .json(messageFunction("CatalogueId doesn't own by you "));
       }
       return res
         .status(200)
-        .json({ message: 'Catalogue deleted successfully' });
+        .json(messageFunction('Catalogue deleted successfully'));
     }
   } catch (error) {
     const errors = errorFunction(error);
@@ -232,7 +243,7 @@ const cataloguePrivate = async (req: Request, res: Response) => {
     const { catalogueId, isPrivate } = req.body;
 
     if (!(isRole === 'company' || isRole === 'user')) {
-      return res.json({ message: 'User is unauthorized' });
+      return res.status(400).json(messageFunction('User is unauthorized'));
     }
 
     if (isRole === 'company') {
@@ -250,9 +261,13 @@ const cataloguePrivate = async (req: Request, res: Response) => {
         .execute();
 
       if (!updatedCataloguePrivate?.affected) {
-        return res.status(400).json({ message: 'Enter proper catalogueId' });
+        return res
+          .status(400)
+          .json(messageFunction("Catalogue doesn't own by you "));
       }
-      return res.status(200).json({ data: updatedCataloguePrivate?.raw?.[0] });
+      return res
+        .status(200)
+        .json(messageFunction('Your catalog is made Private'));
     } else {
       const updatedCataloguePrivate = await catalogueRepository
         .createQueryBuilder()
@@ -268,9 +283,13 @@ const cataloguePrivate = async (req: Request, res: Response) => {
         .execute();
 
       if (!updatedCataloguePrivate?.affected) {
-        return res.status(400).json({ message: 'Enter proper catalogueId' });
+        return res
+          .status(400)
+          .json(messageFunction("Catalogue doesn't own by you "));
       }
-      return res.status(200).json({ data: updatedCataloguePrivate?.raw?.[0] });
+      return res
+        .status(200)
+        .json(messageFunction('Your catalog is made Private'));
     }
   } catch (error) {
     const errors = errorFunction(error);
@@ -287,7 +306,7 @@ const privateCataloguePermission = async (req: Request, res: Response) => {
     const { catalogueId, userId } = req.body;
 
     if (!(isRole === 'company' || isRole === 'user')) {
-      return res.status(400).json({ message: 'User is unauthorized' });
+      return res.status(400).json(messageFunction('User is unauthorized'));
     }
     const catalogueExist = await catalogueRepository
       .createQueryBuilder('catalogue')
@@ -300,17 +319,21 @@ const privateCataloguePermission = async (req: Request, res: Response) => {
         companyOwner: user?.userId,
       })
       .getRawOne();
+    if (!catalogueExist) {
+      return res
+        .status(400)
+        .json(messageFunction("Mentioned Catalogue doesn't Exist"));
+    }
 
     const userExist = await userRepository
       .createQueryBuilder()
       .select()
       .where({ id: userId })
       .getOne();
-
-    if (!(catalogueExist && userExist)) {
+    if (!userExist) {
       return res
         .status(400)
-        .json({ message: "Catalogue or User doesn't Exist" });
+        .json(messageFunction("Mentioned User doesn't Exist"));
     }
 
     const updatedCataloguePrivate = await privateCataloguePermissionRepository
@@ -325,10 +348,9 @@ const privateCataloguePermission = async (req: Request, res: Response) => {
       .returning('*')
       .execute();
 
-    return res.status(200).json({
-      message: 'Private Acess given to the User',
-      data: updatedCataloguePrivate?.raw?.[0],
-    });
+    return res
+      .status(400)
+      .json(messageFunction('Private Access given to the User'));
   } catch (error) {
     const errors = errorFunction(error);
     return res.status(400).json({ errors });
