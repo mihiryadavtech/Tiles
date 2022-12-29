@@ -1,12 +1,11 @@
-import { json, Request, Response } from 'express';
-import { SubRole } from '../entities/SubRole.entity';
+import bcrypt from 'bcrypt';
+import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../dataBaseConnection';
 import { Admin } from '../entities/Admin.entity';
-import { Company } from '../entities/Company.entity';
 import { Catalogue } from '../entities/Catalogue.entity';
-import authenticateToken from '../middleware/auth';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import { Company } from '../entities/Company.entity';
+import { SubRole } from '../entities/SubRole.entity';
 const saltRounds = 12;
 
 const errorFunction = (error: any) => {
@@ -34,16 +33,10 @@ const catalogueRepository = AppDataSource.getRepository(Catalogue);
 
 const registerCompany = async (req: Request, res: Response) => {
   try {
-    // const { adminId, subRoleId } = req.query;
-
     const images = req?.files as Record<string, Express.Multer.File[]>;
     const logo = images?.logo?.[0];
     const cta = images?.cta?.[0];
 
-    console.log(req.body);
-    console.log(images);
-    // console.log(logo);
-    // console.log(cta);
     const {
       name,
       mobile,
@@ -60,6 +53,7 @@ const registerCompany = async (req: Request, res: Response) => {
       subrole,
       admin,
     } = req.body;
+
     const companyExist = await companyRepository
       .createQueryBuilder('company')
       .select()
@@ -76,7 +70,6 @@ const registerCompany = async (req: Request, res: Response) => {
       .getRawOne();
 
     if (!subRoleExist) {
-      console.log(subRoleExist);
       return res.status(400).json({ message: "Subrole doesn't Exist" });
     }
     const salt = await bcrypt.genSalt(saltRounds);
@@ -108,7 +101,6 @@ const registerCompany = async (req: Request, res: Response) => {
       .execute();
     return res.status(200).json({ data: registeredCompany?.raw?.[0] });
   } catch (error) {
-    console.log(error);
     const errors = errorFunction(error);
     return res.status(400).json({ errors });
   }
@@ -125,13 +117,11 @@ const loginCompany = async (req: Request, res: Response) => {
       })
       .getOne();
 
-    // console.log(companyExist?.password);
     if (!companyExist) {
       return res.status(400).json(returnFunction("Company User doesn't exist"));
     }
     const hashPassword = companyExist?.password;
     const correctPassword = await bcrypt.compare(password, hashPassword);
-    // console.log(correctPassword);
     if (!correctPassword) {
       return res.status(400).json(returnFunction('Enter the proper password'));
     }
@@ -141,8 +131,6 @@ const loginCompany = async (req: Request, res: Response) => {
       process.env.TOKEN_KEY as string,
       { expiresIn: '1h' }
     );
-    // console.log(token);
-    // console.log(process.env.TOKEN_KEY);
     return res
       .status(200)
       .json({ message: 'Company User login successfully', token: token });
@@ -156,7 +144,6 @@ const getAllCompany = async (req: Request, res: Response) => {
   try {
     const user = req.app.get('user');
     const isRole = user?.role;
-    // console.log(Boolean(isRole));
 
     if (!(isRole === 'admin' || isRole === 'company')) {
       return res.json({ message: 'User is unauthorized' });
@@ -165,7 +152,6 @@ const getAllCompany = async (req: Request, res: Response) => {
       .createQueryBuilder('company')
       .select()
       .getMany();
-    console.log(AllCompany);
     return res.status(200).json({ data: AllCompany });
   } catch (error) {
     const errors = errorFunction(error);
@@ -178,12 +164,10 @@ const updateCompany = async (req: Request, res: Response) => {
   try {
     const user = req.app.get('user');
     const isRole = user?.role;
-    console.log(user.userId);
 
     if (!(isRole === 'admin' || isRole === 'company')) {
       return res.json({ message: 'User is unauthorized' });
     }
-    console.log('>>>>>>>>>', 'hiiii');
     const images = req?.files as Record<string, Express.Multer.File[]>;
     const logo = images?.logo?.[0];
     const cta = images?.cta?.[0];
@@ -200,7 +184,6 @@ const updateCompany = async (req: Request, res: Response) => {
       disabled,
       description,
     } = req.body;
-    console.log(req.body);
     const updatedCompany = await AppDataSource.createQueryBuilder()
       .update(Company)
       .set({
@@ -223,18 +206,10 @@ const updateCompany = async (req: Request, res: Response) => {
       .execute();
     return res.status(200).json({ data: updatedCompany?.raw?.[0] });
   } catch (error) {
-    // console.log(error);
     const errors = errorFunction(error);
     return res.status(400).json({ errors });
   }
 };
-// const updateLastseen = await userRepository;
-//         .createQueryBuilder('user')
-//         .update(User)
-//         .set({ lastSeen: new Date() })
-//         .where({ id: id })
-//         .returning('*')
-//         .execute();
 
 const deleteCompany = async (req: Request, res: Response) => {
   try {
@@ -262,43 +237,6 @@ const deleteCompany = async (req: Request, res: Response) => {
     res.status(400).json({ errors });
   }
 };
-
-// //All the User in the database
-
-// const getAllUser = async (req: Request, res: Response) => {
-//   try {
-//     const { id } = req.query;
-
-//     if (id?.length && id.length >= 1) {
-//       const updateLastseen = await userRepository
-//         .createQueryBuilder('user')
-//         .update(User)
-//         .set({ lastSeen: new Date() })
-//         .where({ id: id })
-//         .returning('*')
-//         .execute();
-//       const getUser = await userRepository
-//         .createQueryBuilder('user')
-//         .select()
-//         .where({ id: id })
-//         .getRawOne();
-//       res.status(200).json({ data: getUser });
-//     } else if (id === '') {
-//       res.status(400).json({ message: 'Enter proper Id' });
-//     } else {
-//       const getUser = await userRepository
-//         .createQueryBuilder('user')
-//         .select()
-//         .getRawMany();
-//       res.status(200).json({ data: getUser });
-//     }
-//   } catch (error) {
-//     const errors = errorFunction(error);
-//     res.status(400).json({ errors });
-//   }
-// };
-
-//
 
 export {
   registerCompany,

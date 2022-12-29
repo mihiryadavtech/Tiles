@@ -6,6 +6,8 @@ import {
   updateUser,
   deleteUser,
   loginUser,
+  viewCatalog,
+  bookmarkCatalogue,
 } from '../controller/user.controller';
 import multer from 'multer';
 import path from 'path';
@@ -78,7 +80,6 @@ router.post(
         errorArray.push(element?.msg);
       });
 
-      console.log(errorArray);
       return res.status(400).json({ Errors: errorArray });
     }
     return next();
@@ -100,6 +101,8 @@ router.patch(
   updateUser
 );
 router.delete('/user', authenticateToken, deleteUser);
+router.get('/user/view', authenticateToken, viewCatalog);
+router.post('/user/bookmark', authenticateToken, bookmarkCatalogue);
 
 //
 //

@@ -21,13 +21,7 @@ router.post(
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      const errorArray: string[] = [];
-      errors?.array().forEach((element) => {
-        errorArray.push(element?.msg);
-      });
-
-      console.log(errorArray);
-      return res.status(400).json({ Errors: errorArray });
+      return res.status(400).json({ Message: errors?.array() });
     }
     return next();
   },
@@ -43,13 +37,7 @@ router.post(
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      const errorArray: string[] = [];
-      errors?.array().forEach((element) => {
-        errorArray.push(element?.msg);
-      });
-
-      console.log(errorArray);
-      return res.status(400).json({ Errors: errorArray });
+      return res.status(400).json({ Message: errors?.array() });
     }
     return next();
   },

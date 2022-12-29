@@ -7,6 +7,7 @@ import {
   updateCatalogue,
   getAllCatalogue,
   deleteCatalogue,
+  privateCataloguePermission,
 } from '../controller/catalogue.controller';
 
 import multer from 'multer';
@@ -48,6 +49,10 @@ router.patch(
 router.get('/catalogue', authenticateToken, getAllCatalogue);
 router.delete('/catalogue', authenticateToken, deleteCatalogue);
 router.patch('/catalogue/private', cataloguePrivate);
-router.route('/user/');
+router.post(
+  '/catalogue/permission',
+  authenticateToken,
+  privateCataloguePermission
+);
 
 export { router as catalogueRouter };

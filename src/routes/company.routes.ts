@@ -78,7 +78,6 @@ router.post(
         errorArray.push(element?.msg);
       });
 
-      console.log(errorArray);
       return res.status(400).json({ Errors: errorArray });
     }
     return next();

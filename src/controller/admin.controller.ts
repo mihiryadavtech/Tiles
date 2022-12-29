@@ -52,11 +52,13 @@ const createAdmin = async (req: Request, res: Response) => {
       .execute();
 
     const token = jwt.sign(
-      { userId: createdAdmin?.raw?.[0]?.id, role: 'Admin' },
+      { userId: createdAdmin?.raw?.[0]?.id, role: 'admin' },
       process.env.TOKEN_KEY as string,
       { expiresIn: '1h' }
     );
-    return res.status(200).json({ data: createdAdmin?.raw?.[0] });
+    return res
+      .status(200)
+      .json({ message: 'User SignUp successfully', token: token });
   } catch (error) {
     const errors = errorFunction(error);
     return res.status(400).json({ errors });
@@ -74,13 +76,12 @@ const loginAdmin = async (req: Request, res: Response) => {
       })
       .getOne();
 
-    console.log(adminExist?.password);
     if (!adminExist) {
       return res.status(400).json(returnFunction("User doesn't exist"));
     }
     const hashPassword = adminExist?.password;
     const correctPassword = await bcrypt.compare(password, hashPassword);
-    // console.log(correctPassword);
+
     if (!correctPassword) {
       return res.status(400).json(returnFunction('Enter the proper password'));
     }
@@ -90,10 +91,7 @@ const loginAdmin = async (req: Request, res: Response) => {
       process.env.TOKEN_KEY as string,
       { expiresIn: '1h' }
     );
-    // console.log(token);
-    // console.log(process.env.TOKEN_KEY);
 
-    // console.log(res);
     return res
       .status(200)
       .json({ message: 'User login successfully', token: token });
@@ -107,7 +105,6 @@ const getAllAdmin = async (req: Request, res: Response) => {
   try {
     const user = req.app.get('user');
     const isRole = user?.role;
-    // console.log(Boolean(isRole));
 
     if (!(isRole === 'admin')) {
       return res.json({ message: 'User is unauthorized' });
@@ -128,24 +125,21 @@ const approveCatalogue = async (req: Request, res: Response) => {
   try {
     const user = req.app.get('user');
     const isRole = user?.role;
-    // console.log(Boolean(isRole));
+
     if (!(isRole === 'admin')) {
       return res.json({ message: 'User is unauthorized' });
     }
 
-    const { catalogueId, status } = req.query;
-    console.log(req.body);
+    const { catalogueId, status } = req.body;
     const approvedCatalogue = await catalogueRepository
       .createQueryBuilder()
       .update(Catalogue)
       .set({
-        //@ts-ignore
         status: status,
       })
       .where({ id: catalogueId })
       .returning('*')
       .execute();
-    console.log(approvedCatalogue);
     if (!approvedCatalogue?.affected) {
       return res.status(200).json({ message: 'Enter proper data' });
     }

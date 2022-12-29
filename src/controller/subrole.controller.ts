@@ -22,15 +22,11 @@ const createSubrole = async (req: Request, res: Response) => {
     const { name, slug, disabled, isDeletable } = req.body;
 
     const user = req.app.get('user');
-    console.log(user);
     const isRole = user?.role;
-    console.log(Boolean(isRole));
 
     if (!(isRole === 'admin')) {
       return res.json({ message: 'User is unauthorized' });
     }
-    // console.log('>>>>>>>>>', isAdmin);
-    // console.log(user?.userId);
 
     const createdSubrole = await adminRepository
       .createQueryBuilder()
@@ -56,9 +52,7 @@ const createSubrole = async (req: Request, res: Response) => {
 const getAllSubrole = async (req: Request, res: Response) => {
   try {
     const user = req.app.get('user');
-    console.log(user);
     const isRole = user?.role;
-    console.log(Boolean(isRole));
 
     if (!(isRole === 'admin')) {
       return res.json({ message: 'User is unauthorized' });
@@ -70,7 +64,6 @@ const getAllSubrole = async (req: Request, res: Response) => {
       .getMany();
     return res.status(200).json({ data: allSubrole });
   } catch (error) {
-    console.log(error);
     const errors = errorFunction(error);
     return res.status(400).json({ errors });
   }

@@ -50,7 +50,6 @@ const AppDataSource = new DataSource({
   username: 'postgres',
   password: 'password',
   database: 'tiles',
-  // entities: ['./src/entities/*.ts'],
   entities: [
     Admin,
     AreaType,

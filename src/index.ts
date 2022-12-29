@@ -22,7 +22,9 @@ const main = async () => {
   try {
     //Database Intilaization
     await AppDataSource.initialize();
-
+    // image Show
+    app.use('/api/v1/image', express.static('uploads/user'));
+    app.use('/api/v1/image', express.static('uploads/company'));
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
