@@ -3,10 +3,10 @@ import { body, validationResult } from 'express-validator';
 
 import {
   createCatalogue,
-  companyCataloguePrivate,
-  userCataloguePrivate,
+  cataloguePrivate,
   updateCatalogue,
   getAllCatalogue,
+  deleteCatalogue,
 } from '../controller/catalogue.controller';
 
 import multer from 'multer';
@@ -46,8 +46,8 @@ router.patch(
   updateCatalogue
 );
 router.get('/catalogue', authenticateToken, getAllCatalogue);
-router.patch('/user/catalogue/private', userCataloguePrivate);
-router.patch('/company/catalogue/private', companyCataloguePrivate);
+router.delete('/catalogue', authenticateToken, deleteCatalogue);
+router.patch('/catalogue/private', cataloguePrivate);
 router.route('/user/');
 
 export { router as catalogueRouter };

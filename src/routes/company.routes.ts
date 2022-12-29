@@ -2,9 +2,6 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
 
 import {
-  companyCreateCatalogue,
-  companyDeleteCatalogue,
-  companyUpdateCatalogue,
   registerCompany,
   deleteCompany,
   loginCompany,
@@ -101,24 +98,5 @@ router.patch(
   updateCompany
 );
 router.delete('/company', authenticateToken, deleteCompany);
-
-router.post(
-  '/company/catalogue',
-  upload.fields([
-    { name: 'pdf', maxCount: 1 },
-    { name: 'previewImage', maxCount: 1 },
-  ]),
-  companyCreateCatalogue
-);
-
-router.patch(
-  '/company/catalogue',
-  upload.fields([
-    { name: 'pdf', maxCount: 1 },
-    { name: 'previewImage', maxCount: 1 },
-  ]),
-  companyUpdateCatalogue
-);
-router.delete('/company/catalogue', companyDeleteCatalogue);
 
 export { router as companyRouter };

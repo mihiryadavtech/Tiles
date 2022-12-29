@@ -5,8 +5,6 @@ import {
   registerUser,
   updateUser,
   deleteUser,
-  userDeleteCatalogue,
-  userUpdateCatalogue,
   loginUser,
 } from '../controller/user.controller';
 import multer from 'multer';
@@ -108,14 +106,4 @@ router.delete('/user', authenticateToken, deleteUser);
 //
 //
 
-
-router.patch(
-  '/user/catalogue',
-  upload.fields([
-    { name: 'pdf', maxCount: 1 },
-    { name: 'previewImage', maxCount: 1 },
-  ]),
-  userUpdateCatalogue
-);
-router.delete('/user/catalogue', userDeleteCatalogue);
 export { router as userRouter };

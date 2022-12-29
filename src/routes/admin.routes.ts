@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
 import authenticateToken from '../middleware/auth';
 import {
+  approveCatalogue,
   createAdmin,
   getAllAdmin,
   loginAdmin,
@@ -54,5 +55,7 @@ router.post(
   },
   loginAdmin
 );
+
+router.patch('/admin/approve', authenticateToken, approveCatalogue);
 
 export { router as adminRouter };

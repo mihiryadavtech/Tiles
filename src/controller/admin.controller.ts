@@ -3,6 +3,7 @@ import { AppDataSource } from '../dataBaseConnection';
 import { Admin } from '../entities/Admin.entity';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { Catalogue } from '../entities/Catalogue.entity';
 const saltRounds = 12;
 
 const errorFunction = (error: any) => {
@@ -11,7 +12,7 @@ const errorFunction = (error: any) => {
     error: {
       message: error.message,
     },
-    message: 'Check entered data  properly',
+    message: 'Check entered data properly',
   };
   return errors;
 };
@@ -24,6 +25,7 @@ const returnFunction = (_message: string) => {
 };
 
 const adminRepository = AppDataSource.getRepository(Admin);
+const catalogueRepository = AppDataSource.getRepository(Catalogue);
 
 const createAdmin = async (req: Request, res: Response) => {
   try {
@@ -121,4 +123,37 @@ const getAllAdmin = async (req: Request, res: Response) => {
     return res.status(400).json({ errors });
   }
 };
-export { createAdmin, getAllAdmin, loginAdmin };
+
+const approveCatalogue = async (req: Request, res: Response) => {
+  try {
+    const user = req.app.get('user');
+    const isRole = user?.role;
+    // console.log(Boolean(isRole));
+    if (!(isRole === 'admin')) {
+      return res.json({ message: 'User is unauthorized' });
+    }
+
+    const { catalogueId, status } = req.query;
+    console.log(req.body);
+    const approvedCatalogue = await catalogueRepository
+      .createQueryBuilder()
+      .update(Catalogue)
+      .set({
+        //@ts-ignore
+        status: status,
+      })
+      .where({ id: catalogueId })
+      .returning('*')
+      .execute();
+    console.log(approvedCatalogue);
+    if (!approvedCatalogue?.affected) {
+      return res.status(200).json({ message: 'Enter proper data' });
+    }
+    return res.status(200).json({ data: approvedCatalogue?.raw?.[0] });
+  } catch (error) {
+    const errors = errorFunction(error);
+    return res.status(400).json({ errors });
+  }
+};
+
+export { createAdmin, getAllAdmin, loginAdmin, approveCatalogue };
