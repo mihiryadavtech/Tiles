@@ -17,10 +17,11 @@ export class BookmarkedCatalogue extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Catalogue, (catalogue) => catalogue.user)
+  @ManyToOne(() => Catalogue, (catalogue) => catalogue.user, {
+    onDelete: 'CASCADE',
+  })
   relCatalogue: Catalogue;
 
   @ManyToOne(() => User, (user) => user.boookmarkCatalogue)
   relUser: User;
-
 }

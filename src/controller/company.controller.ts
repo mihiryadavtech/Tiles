@@ -19,9 +19,10 @@ const errorFunction = (error: any) => {
   return errors;
 };
 
-const returnFunction = (_message: string) => {
+const messageFunction = (_message: string, _token?: string) => {
   const message = {
     message: _message,
+    token: _token,
   };
   return message;
 };
@@ -61,7 +62,7 @@ const registerCompany = async (req: Request, res: Response) => {
       .getOne();
 
     if (companyExist) {
-      return res.status(400).json({ message: 'Company  Exist' });
+      return res.status(400).json(messageFunction('Company Already Exist'));
     }
     const subRoleExist = await subRoleRepository
       .createQueryBuilder('subrole')
@@ -70,7 +71,7 @@ const registerCompany = async (req: Request, res: Response) => {
       .getRawOne();
 
     if (!subRoleExist) {
-      return res.status(400).json({ message: "Subrole doesn't Exist" });
+      return res.status(400).json(messageFunction("Subrole doesn't Exist"));
     }
     const salt = await bcrypt.genSalt(saltRounds);
     const hashPassword = await bcrypt.hash(password, salt);
@@ -94,12 +95,14 @@ const registerCompany = async (req: Request, res: Response) => {
         disabled: disabled,
         cta: cta,
         description: description,
-        // admin: adminExist.admin_id,
+        // admin: user.user_id,
         subrole: subRoleExist?.subrole_id,
       })
       .returning('*')
       .execute();
-    return res.status(200).json({ data: registeredCompany?.raw?.[0] });
+    return res
+      .status(200)
+      .json(messageFunction('Registered company successfully'));
   } catch (error) {
     const errors = errorFunction(error);
     return res.status(400).json({ errors });
@@ -118,12 +121,14 @@ const loginCompany = async (req: Request, res: Response) => {
       .getOne();
 
     if (!companyExist) {
-      return res.status(400).json(returnFunction("Company User doesn't exist"));
+      return res
+        .status(400)
+        .json(messageFunction("Company User doesn't exist"));
     }
     const hashPassword = companyExist?.password;
     const correctPassword = await bcrypt.compare(password, hashPassword);
     if (!correctPassword) {
-      return res.status(400).json(returnFunction('Enter the proper password'));
+      return res.status(400).json(messageFunction('Enter the proper password'));
     }
 
     const token = jwt.sign(
@@ -133,7 +138,7 @@ const loginCompany = async (req: Request, res: Response) => {
     );
     return res
       .status(200)
-      .json({ message: 'Company User login successfully', token: token });
+      .json(messageFunction('Company User login successfully', token));
   } catch (error) {
     const errors = errorFunction(error);
     return res.status(400).json({ errors });
@@ -146,7 +151,7 @@ const getAllCompany = async (req: Request, res: Response) => {
     const isRole = user?.role;
 
     if (!(isRole === 'admin' || isRole === 'company')) {
-      return res.json({ message: 'User is unauthorized' });
+      return res.status(400).json(messageFunction('User is unauthorized'));
     }
     const AllCompany = await companyRepository
       .createQueryBuilder('company')
@@ -166,7 +171,7 @@ const updateCompany = async (req: Request, res: Response) => {
     const isRole = user?.role;
 
     if (!(isRole === 'admin' || isRole === 'company')) {
-      return res.json({ message: 'User is unauthorized' });
+      return res.status(400).json(messageFunction('User is unauthorized'));
     }
     const images = req?.files as Record<string, Express.Multer.File[]>;
     const logo = images?.logo?.[0];
@@ -204,7 +209,9 @@ const updateCompany = async (req: Request, res: Response) => {
       .where({ id: user?.userId })
       .returning('*')
       .execute();
-    return res.status(200).json({ data: updatedCompany?.raw?.[0] });
+    return res
+      .status(200)
+      .json(messageFunction('Company Updated successfully'));
   } catch (error) {
     const errors = errorFunction(error);
     return res.status(400).json({ errors });
@@ -213,28 +220,25 @@ const updateCompany = async (req: Request, res: Response) => {
 
 const deleteCompany = async (req: Request, res: Response) => {
   try {
-    const { adminId, companyId } = req.query;
-    const adminExist = await adminRepository
-      .createQueryBuilder('admin')
-      .select()
-      .where({ id: adminId })
-      .getRawOne();
-    if (adminExist) {
-      const deletedCompany = await companyRepository
-        .createQueryBuilder('company')
-        .delete()
-        .from(Company)
-        .where({ id: companyId })
-        .returning('*')
-        .execute();
+    const user = req.app.get('user');
+    const isRole = user?.role;
 
-      res.status(201).json({ data: deletedCompany.raw[0] });
-    } else {
-      res.status(400).json({ message: 'User is Unauthorized' });
+    if (!(isRole === 'company')) {
+      return res.status(400).json(messageFunction('User is unauthorized'));
     }
+
+    const deletedCompany = await companyRepository
+      .createQueryBuilder('company')
+      .delete()
+      .from(Company)
+      .where({ id: user.userId })
+      .returning('*')
+      .execute();
+
+    return res.status(200).json(messageFunction('Company is deleted'));
   } catch (error) {
     const errors = errorFunction(error);
-    res.status(400).json({ errors });
+    return res.status(400).json({ errors });
   }
 };
 

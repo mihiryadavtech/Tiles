@@ -83,7 +83,7 @@ export class Category extends BaseEntity {
 
   @OneToMany(
     () => PrivateCataloguePermission,
-    (privateCataloguePermission) => privateCataloguePermission.relCatelogue
+    (privateCataloguePermission) => privateCataloguePermission.relCatalogue
   )
   privateUser: PrivateCataloguePermission[];
 

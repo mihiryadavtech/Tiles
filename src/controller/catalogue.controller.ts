@@ -121,7 +121,9 @@ const updateCatalogue = async (req: Request, res: Response) => {
           .status(400)
           .json(messageFunction("CatalogueId doesn't belong to you "));
       }
-      return res.status(200).json({ data: updatedCatalogue?.raw?.[0] });
+      return res
+        .status(200)
+        .json(messageFunction('Catalogue updated successfully'));
     } else {
       const updatedCatalogue = await catalogueRepository
         .createQueryBuilder()
@@ -140,13 +142,14 @@ const updateCatalogue = async (req: Request, res: Response) => {
         .andWhere({ userOwner: user?.userId })
         .returning('*')
         .execute();
-      console.log(updatedCatalogue);
       if (!updatedCatalogue?.affected) {
         return res
           .status(400)
           .json(messageFunction("CatalogueId doesn't belong to you "));
       }
-      return res.status(200).json({ data: updatedCatalogue?.raw?.[0] });
+      return res
+        .status(200)
+        .json(messageFunction('Catalogue updated successfully'));
     }
   } catch (error) {
     const errors = errorFunction(error);
@@ -308,23 +311,6 @@ const privateCataloguePermission = async (req: Request, res: Response) => {
     if (!(isRole === 'company' || isRole === 'user')) {
       return res.status(400).json(messageFunction('User is unauthorized'));
     }
-    const catalogueExist = await catalogueRepository
-      .createQueryBuilder('catalogue')
-      .select()
-      .where({ id: catalogueId })
-      .orWhere({
-        userOwner: user?.userId,
-      })
-      .orWhere({
-        companyOwner: user?.userId,
-      })
-      .getRawOne();
-    if (!catalogueExist) {
-      return res
-        .status(400)
-        .json(messageFunction("Mentioned Catalogue doesn't Exist"));
-    }
-
     const userExist = await userRepository
       .createQueryBuilder()
       .select()
@@ -333,24 +319,69 @@ const privateCataloguePermission = async (req: Request, res: Response) => {
     if (!userExist) {
       return res
         .status(400)
-        .json(messageFunction("Mentioned User doesn't Exist"));
+        .json(messageFunction("Mentioned user doesn't Exist"));
     }
 
-    const updatedCataloguePrivate = await privateCataloguePermissionRepository
-      .createQueryBuilder('catalogue')
-      .insert()
-      .into(PrivateCataloguePermission)
-      .values({
-        status: catalogueExist?.catalogue_status,
-        relCatelogue: catalogueExist?.catalogue_id,
-        relUser: userId,
-      })
-      .returning('*')
-      .execute();
+    if (isRole === 'company') {
+      const catalogueExist = await catalogueRepository
+        .createQueryBuilder('catalogue')
+        .select()
+        .where({ id: catalogueId })
+        .andWhere({
+          companyOwner: user?.userId,
+        })
+        .getRawOne();
+      if (!catalogueExist) {
+        return res
+          .status(400)
+          .json(messageFunction("Mentioned Catalogue doesn't own by you"));
+      }
+      console.log('>>>>>>', catalogueExist);
+      const updatedCataloguePrivate = await privateCataloguePermissionRepository
+        .createQueryBuilder('catalogue')
+        .insert()
+        .into(PrivateCataloguePermission)
+        .values({
+          status: catalogueExist?.catalogue_status,
+          relCatalogue: catalogueExist?.catalogue_id,
+          relUser: userId,
+        })
+        .returning('*')
+        .execute();
 
-    return res
-      .status(400)
-      .json(messageFunction('Private Access given to the User'));
+      return res
+        .status(400)
+        .json(messageFunction('Private Access given to the User'));
+    } else {
+      const catalogueExist = await catalogueRepository
+        .createQueryBuilder('catalogue')
+        .select()
+        .where({ id: catalogueId })
+        .andWhere({
+          userOwner: user?.userId,
+        })
+        .getRawOne();
+      if (!catalogueExist) {
+        return res
+          .status(400)
+          .json(messageFunction("Mentioned Catalogue doesn't own by you"));
+      }
+      const updatedCataloguePrivate = await privateCataloguePermissionRepository
+        .createQueryBuilder('catalogue')
+        .insert()
+        .into(PrivateCataloguePermission)
+        .values({
+          status: catalogueExist?.catalogue_status,
+          relCatalogue: catalogueExist?.catalogue_id,
+          relUser: userId,
+        })
+        .returning('*')
+        .execute();
+
+      return res
+        .status(400)
+        .json(messageFunction('Private Access given to the User'));
+    }
   } catch (error) {
     const errors = errorFunction(error);
     return res.status(400).json({ errors });

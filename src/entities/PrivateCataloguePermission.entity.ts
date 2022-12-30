@@ -31,8 +31,10 @@ export class PrivateCataloguePermission extends BaseEntity {
   })
   status: Status;
 
-  @ManyToOne(() => Catalogue, (catalogue) => catalogue.privateUser)
-  relCatelogue: Catalogue;
+  @ManyToOne(() => Catalogue, (catalogue) => catalogue.privateUser, {
+    onDelete: 'CASCADE',
+  })
+  relCatalogue: Catalogue;
 
   @ManyToOne(() => User, (user) => user.privateCatelogue)
   relUser: User;

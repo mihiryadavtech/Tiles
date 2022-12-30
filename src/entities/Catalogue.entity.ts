@@ -69,7 +69,7 @@ export class Catalogue extends BaseEntity {
   @ManyToOne(() => Category, (category) => category.catalogue)
   category: Category;
 
-  @ManyToOne(() => User, (user) => user.catalogue)
+  @ManyToOne(() => User, (user) => user.catalogue, { onDelete: 'CASCADE' })
   userOwner: User;
 
   @ManyToOne(() => Company, (company) => company.catalogue)
@@ -83,13 +83,15 @@ export class Catalogue extends BaseEntity {
 
   @OneToMany(
     () => BookmarkedCatalogue,
-    (bookMarkedCatalogue) => bookMarkedCatalogue.relCatalogue
+    (bookMarkedCatalogue) => bookMarkedCatalogue.relCatalogue,
+    { onDelete: 'CASCADE' }
   )
   user: CatalogueSizes[];
 
   @OneToMany(
     () => PrivateCataloguePermission,
-    (privateCataloguePermission) => privateCataloguePermission.relCatelogue
+    (privateCataloguePermission) => privateCataloguePermission.relCatalogue,
+    { onDelete: 'CASCADE' }
   )
   privateUser: CatalogueSizes[];
 

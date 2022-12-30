@@ -148,7 +148,7 @@ export class User extends BaseEntity {
   @OneToMany(() => ReportedPosts, (reportedPosts) => reportedPosts.user)
   reportedPosts: ReportedPosts[];
 
-  @OneToMany(() => Catalogue, (catalogue) => catalogue.userOwner)
+  @OneToMany(() => Catalogue, (catalogue) => catalogue.userOwner,{onDelete:'CASCADE'})
   catalogue: Catalogue[];
 
   @OneToMany(() => Contact, (contact) => contact.user)

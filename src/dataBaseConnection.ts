@@ -47,9 +47,9 @@ const AppDataSource = new DataSource({
   type: 'postgres',
   host: 'localhost',
   port: 5432,
-  username: 'postgres',
-  password: 'password',
-  database: 'tiles',
+  username: process.env.DATABASE_USERNAME as string,
+  password: process.env.DATABASE_PASSWORD as string,
+  database: process.env.DATABASE_NAME as string,
   entities: [
     Admin,
     AreaType,
@@ -96,7 +96,7 @@ const AppDataSource = new DataSource({
     UserDealingCategory,
   ],
   migrations: ['src/migrations/**/*.ts'],
-  logging: true,
+  logging: false,
   synchronize: false,
 });
 

@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { body, validationResult } from 'express-validator';
+import { check, body, validationResult } from 'express-validator';
 
 import {
   createCatalogue,
@@ -35,6 +35,21 @@ router.post(
     { name: 'pdf', maxCount: 1 },
     { name: 'previewImage', maxCount: 1 },
   ]),
+  [
+    body('name').isLength({ min: 3 }).withMessage('Enter your Name'),
+    body('description', 'Enter proper description ').optional(false),
+    body('isPrivate').isBoolean().withMessage('Enter the value for private'),
+    body(''),
+  ],
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ Message: errors?.array() });
+    }
+
+    return next();
+  },
   createCatalogue
 );
 router.patch(

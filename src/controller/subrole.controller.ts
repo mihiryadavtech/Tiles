@@ -14,6 +14,14 @@ const errorFunction = (error: any) => {
   return errors;
 };
 
+const messageFunction = (_message: string, _token?: string) => {
+  const message = {
+    message: _message,
+    token: _token,
+  };
+  return message;
+};
+
 const adminRepository = AppDataSource.getRepository(Admin);
 const subRoleRepository = AppDataSource.getRepository(SubRole);
 
@@ -25,7 +33,7 @@ const createSubrole = async (req: Request, res: Response) => {
     const isRole = user?.role;
 
     if (!(isRole === 'admin')) {
-      return res.json({ message: 'User is unauthorized' });
+      return res.status(400).json(messageFunction('User is unauthorized'));
     }
 
     const createdSubrole = await adminRepository
@@ -42,7 +50,7 @@ const createSubrole = async (req: Request, res: Response) => {
       .returning('*')
       .execute();
 
-    return res.status(200).json({ data: createdSubrole?.raw?.[0] });
+    return res.status(200).json(messageFunction('Subrole created succesfully'));
   } catch (error) {
     const errors = errorFunction(error);
     return res.status(400).json({ errors });
@@ -52,16 +60,21 @@ const createSubrole = async (req: Request, res: Response) => {
 const getAllSubrole = async (req: Request, res: Response) => {
   try {
     const user = req.app.get('user');
+    if (!user) {
+      return res.status(400).json(messageFunction("User doesn't exist"));
+    }
+
     const isRole = user?.role;
 
     if (!(isRole === 'admin')) {
-      return res.json({ message: 'User is unauthorized' });
+      return res.status(400).json(messageFunction('User is unauthorized'));
     }
 
     const allSubrole = await subRoleRepository
       .createQueryBuilder('subrole')
       .select()
       .getMany();
+
     return res.status(200).json({ data: allSubrole });
   } catch (error) {
     const errors = errorFunction(error);

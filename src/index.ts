@@ -14,7 +14,7 @@ import { User } from './entities/User.Entity';
 const userRepository = AppDataSource.getRepository(User);
 
 const app = express();
-const Port = 2300;
+const Port = (process.env.PORT as string) || 3000;
 
 //Port Connection
 
