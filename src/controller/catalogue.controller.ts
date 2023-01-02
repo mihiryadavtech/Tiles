@@ -336,7 +336,6 @@ const privateCataloguePermission = async (req: Request, res: Response) => {
           .status(400)
           .json(messageFunction("Mentioned Catalogue doesn't own by you"));
       }
-      console.log('>>>>>>', catalogueExist);
       const updatedCataloguePrivate = await privateCataloguePermissionRepository
         .createQueryBuilder('catalogue')
         .insert()

@@ -66,11 +66,21 @@ const registerUser = async (req: Request, res: Response) => {
       .where({
         email: email,
       })
-      .orWhere({ mobile: mobile })
       .getOne();
-
     if (userExist) {
-      return res.status(400).json(messageFunction('User Already Exist'));
+      return res
+        .status(400)
+        .json(messageFunction(' Email belongs to another User'));
+    }
+    const userMobileExist = await userRepository
+      .createQueryBuilder()
+      .select()
+      .where({ mobile: mobile })
+      .getOne();
+    if (userMobileExist) {
+      return res
+        .status(400)
+        .json(messageFunction('Mobile Number belongs to another User'));
     }
     const subRoleExist = await subRoleRepository
       .createQueryBuilder('subrole')
@@ -260,7 +270,7 @@ const deleteUser = async (req: Request, res: Response) => {
             .returning('*')
             .execute();
         } catch (error) {
-          console.log('>>>>>>>>>>>>>>', error);
+          res.status(400).json(error);
         }
       },
       { scheduled: false }
@@ -284,39 +294,34 @@ const getAllUser = async (req: Request, res: Response) => {
     if (!(isRole === 'admin' || isRole === 'user')) {
       return res.status(400).json(messageFunction('User is unauthorized'));
     }
-    const AllUser = await userRepository
+    const allUser = await userRepository
       .createQueryBuilder('company')
       .select()
-      .getMany();
+      .getRawMany();
+    let allUserWithUrl = allUser;
+    for (let index = 0; index < allUserWithUrl.length; index++) {
+      const element = allUserWithUrl[index];
 
-    // let allUserWithUrl = AllUser;
-    // for (let index = 0; index < allUserWithUrl.length; index++) {
-    //   const element = allUserWithUrl[index];
-    //   const profilePhoto = element?.profilePhoto;
-    //   const profilePhotoUrlImage = `http://localhost:${process.env.PORT}/api/v1/image/${profilePhoto?.filename}`;
+      const profilePhoto = element?.company_profile_photo;
+      const profilePhotoUrlImage = `http://localhost:${process.env.PORT}/api/v1/image/${profilePhoto?.filename}`;
 
-    //   // const visitingCard = element?.visitingCard;
-    //   // const visitingCardUrlImage = `http://localhost:${process.env.PORT}/api/v1/image/${visitingCard?.filename}`;
+      const visitingCard = element?.company_visiting_card;
+      const visitingCardUrlImage = `http://localhost:${process.env.PORT}/api/v1/image/${visitingCard?.filename}`;
 
-    //   // const verificationDoc = element?.verificationDoc;
-    //   // // @ts-ignore
-    //   // for (const item in verificationDoc) {
-    //   //   // @ts-ignore
-    //   //   const image = verificationDoc[item];
-    //   //   const urlImage = `http://localhost:${process.env.PORT}/api/v1/image/${image.filename}`;
-    //   //   console.log(urlImage);
-    //   // }
-    //   console.log('>>>>>>>>>>', profilePhotoUrlImage);
-    //   console.log(
-    //     '00000',
-    //     (allUserWithUrl[index].profilePhoto.imageurl = profilePhotoUrlImage)
-    //   );
-    //   console.log(allUserWithUrl[index]);
-    // }
-    // const sendWithImages = allUserWithUrl;
-    // console.log('>>>>+++++>>>>>>', allUserWithUrl);
+      const verificationDoc = element?.company_verification_doc;
+      for (const item in verificationDoc) {
+        const image = verificationDoc[item];
+        const urlImage = `http://localhost:${process.env.PORT}/api/v1/image/${image.filename}`;
+      }
+      allUserWithUrl[index].company_profile_photo.imageurl =
+        profilePhotoUrlImage;
+      //
+      allUserWithUrl[index].company_visiting_card.imageurl =
+        visitingCardUrlImage;
+    }
+    const sendWithImages = allUserWithUrl;
 
-    return res.status(200).json({ data: AllUser });
+    return res.status(200).json({ data: sendWithImages });
   } catch (error) {
     const errors = errorFunction(error);
     return res.status(400).json({ errors });

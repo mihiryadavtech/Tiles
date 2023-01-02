@@ -39,7 +39,6 @@ router.post(
     body('name').isLength({ min: 3 }).withMessage('Enter your Name'),
     body('description', 'Enter proper description ').optional(false),
     body('isPrivate').isBoolean().withMessage('Enter the value for private'),
-    body(''),
   ],
   (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);

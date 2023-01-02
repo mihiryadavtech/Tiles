@@ -36,6 +36,6 @@ export class PrivateCataloguePermission extends BaseEntity {
   })
   relCatalogue: Catalogue;
 
-  @ManyToOne(() => User, (user) => user.privateCatelogue)
+  @ManyToOne(() => User, (user) => user.privateCatalogue)
   relUser: User;
 }

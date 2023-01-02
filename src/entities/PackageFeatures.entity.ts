@@ -1,9 +1,9 @@
 import file from 'src/interfaces/file';
 
 enum Features {
-  APPROVED = 'Approved',
-  REJECTED = 'Rejected',
-  INREVIEW = 'InReview',
+  INREVIEW = 0,
+  APPROVED = 1,
+  REJECTED = 2,
 }
 import {
   Entity,

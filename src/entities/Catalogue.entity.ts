@@ -97,7 +97,7 @@ export class Catalogue extends BaseEntity {
 
   @OneToMany(
     () => CatalogueViewer,
-    (catalogueViewer) => catalogueViewer.relCatelogue
+    (catalogueViewer) => catalogueViewer.relCatalogue
   )
   userViewer: CatalogueSizes[];
 }

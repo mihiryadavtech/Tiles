@@ -22,7 +22,7 @@ export class CatalogueViewer extends BaseEntity {
   count: bigint;
 
   @ManyToOne(() => Catalogue, (catalogue) => catalogue.userViewer)
-  relCatelogue: Catalogue;
+  relCatalogue: Catalogue;
 
   @ManyToOne(() => User, (user) => user.catalogueViewer)
   relUser: User;

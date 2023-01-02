@@ -1,11 +1,10 @@
 import file from 'src/interfaces/file';
 
 enum Inquiry_type {
-  APPROVED = 'Approved',
-  REJECTED = 'Rejected',
-  INREVIEW = 'InReview',
-}
-import {
+  INREVIEW = 0,
+  APPROVED = 1,
+  REJECTED = 2,
+}import {
   Entity,
   BaseEntity,
   Column,

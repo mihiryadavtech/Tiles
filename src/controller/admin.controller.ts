@@ -124,7 +124,6 @@ const getAllAdmin = async (req: Request, res: Response) => {
 
     return res.status(200).json({ data: getAllAdmin });
   } catch (error) {
-    console.log(error);
     const errors = errorFunction(error);
     return res.status(400).json({ errors });
   }
@@ -352,7 +351,6 @@ const adminUpdateUser = async (req: Request, res: Response) => {
       .status(200)
       .json(messageFunction('User is updated successfully'));
   } catch (error) {
-    console.log(error?.detail);
     const errors = errorFunction(error);
     return res.status(400).json({ errors });
   }

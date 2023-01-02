@@ -14,10 +14,8 @@ const authenticateToken = async (
     }
     const user = jwt.verify(token, process.env.TOKEN_KEY as string);
     req.app.set('user', user);
-    console.log('Inside Auth>>>>>>>', user);
     return next();
   } catch (error) {
-    console.log(error);
     return res.status(400).json({ message: error.message });
   }
 };

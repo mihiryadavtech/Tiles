@@ -9,7 +9,7 @@ import { adminRouter } from './routes/admin.routes';
 import { subroleRouter } from './routes/subrole.routes';
 import { userRouter } from './routes/user.routes';
 import { companyRouter } from './routes/company.routes';
-import { catalogueRouter } from './routes/catelogue.routes';
+import { catalogueRouter } from './routes/catalogue.routes';
 import { User } from './entities/User.Entity';
 const userRepository = AppDataSource.getRepository(User);
 

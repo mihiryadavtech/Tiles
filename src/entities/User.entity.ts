@@ -127,8 +127,8 @@ export class User extends BaseEntity {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp' })
-  deletedAt?: Date;
+  // @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp' })
+  // deletedAt?: Date;
 
   @ManyToOne(() => SubRole, (subRole) => subRole.user)
   subrole: SubRole;
@@ -170,7 +170,7 @@ export class User extends BaseEntity {
     () => PrivateCataloguePermission,
     (privateCataloguePermission) => privateCataloguePermission.relUser
   )
-  privateCatelogue: PrivateCataloguePermission[];
+  privateCatalogue: PrivateCataloguePermission[];
 
   @OneToMany(
     () => CatalogueViewer,
