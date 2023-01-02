@@ -24,7 +24,7 @@ import { Post } from './Post.entity';
 import { PrivateCataloguePermission } from './PrivateCataloguePermission.entity';
 import { Product } from './Product.entity';
 import { Type } from './Type.entity';
-import { UserDealingCategory } from './UserDealingcategory.entity';
+import { UserDealingCategory } from './UserDealingCategory.entity';
 @Entity('category')
 export class Category extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -87,15 +87,9 @@ export class Category extends BaseEntity {
   )
   privateUser: PrivateCataloguePermission[];
 
-  @OneToMany(
-    () => CategorySize,
-    (categorysize) => categorysize.relCategory
-  )
+  @OneToMany(() => CategorySize, (categorysize) => categorysize.relCategory)
   size: CategorySize[];
 
-  @OneToMany(
-    () => CategoryUnit,
-    (categoryunit) => categoryunit.relCategory
-  )
+  @OneToMany(() => CategoryUnit, (categoryunit) => categoryunit.relCategory)
   unit: CategoryUnit[];
 }

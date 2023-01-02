@@ -153,11 +153,25 @@ const getAllCompany = async (req: Request, res: Response) => {
     if (!(isRole === 'admin' || isRole === 'company')) {
       return res.status(400).json(messageFunction('User is unauthorized'));
     }
-    const AllCompany = await companyRepository
+    const allCompany = await companyRepository
       .createQueryBuilder('company')
       .select()
-      .getMany();
-    return res.status(200).json({ data: AllCompany });
+      .getRawMany();
+    let allCompanyWithUrl = allCompany;
+    for (let index = 0; index < allCompanyWithUrl.length; index++) {
+      const element = allCompanyWithUrl[index];
+
+      const companyLogo = element?.company_logo;
+      const companyLogoImage = `http://localhost:${process.env.PORT}/api/v1/image/${companyLogo?.filename}`;
+
+      const cta = element?.company_cta;
+      const ctaImage = `http://localhost:${process.env.PORT}/api/v1/image/${cta?.filename}`;
+
+      allCompanyWithUrl[index].company_logo.imageurl = companyLogoImage;
+      allCompanyWithUrl[index].company_cta.imageurl = ctaImage;
+    }
+    
+    return res.status(200).json({ data: allCompanyWithUrl });
   } catch (error) {
     const errors = errorFunction(error);
     return res.status(400).json({ errors });
@@ -235,7 +249,9 @@ const deleteCompany = async (req: Request, res: Response) => {
       .returning('*')
       .execute();
 
-    return res.status(200).json(messageFunction('Company is deleted'));
+    return res
+      .status(200)
+      .json(messageFunction('Company deleted successfully'));
   } catch (error) {
     const errors = errorFunction(error);
     return res.status(400).json({ errors });

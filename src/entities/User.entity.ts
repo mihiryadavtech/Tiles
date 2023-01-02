@@ -35,41 +35,41 @@ import { PrivateCataloguePermission } from './PrivateCataloguePermission.entity'
 import { ReportedPosts } from './ReportedPosts.entity';
 import { SubRole } from './SubRole.entity';
 import { Subscription } from './Subscription.entity';
-import { UserDealingCategory } from './UserDealingcategory.entity';
+import { UserDealingCategory } from './UserDealingCategory.entity';
 
 @Entity('user')
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({name:'name', type: 'varchar', length: 150 })
+  @Column({ name: 'name', type: 'varchar', length: 150 })
   name: string;
 
   @Column({ name: 'profile_photo', type: 'jsonb', nullable: true })
   profilePhoto: file;
 
-  @Column({ name:'mobile',type: 'varchar', length: 15, unique: true })
+  @Column({ name: 'mobile', type: 'varchar', length: 15, unique: true })
   mobile: number;
 
   @Column({ name: 'wa_mobile', type: 'varchar', length: 15, nullable: true })
   waMobile: number;
 
-  @Column({ name:'email',type: 'varchar', unique: true })
+  @Column({ name: 'email', type: 'varchar', unique: true })
   email: string;
 
   @Column({ type: 'varchar' })
   password: string;
 
-  @Column({ name:'country',type: 'varchar' })
+  @Column({ name: 'country', type: 'varchar' })
   country: string;
 
-  @Column({ name:'state',type: 'varchar' })
+  @Column({ name: 'state', type: 'varchar' })
   state: string;
 
-  @Column({ name:'city',type: 'varchar' })
+  @Column({ name: 'city', type: 'varchar' })
   city: string;
 
-  @Column({ name:'role',type: 'enum', enum: Role, default: Role.BUYER })
+  @Column({ name: 'role', type: 'enum', enum: Role, default: Role.BUYER })
   role: Role;
 
   @Column({ name: 'gst_number', type: 'varchar', length: 15, nullable: true })
@@ -109,16 +109,16 @@ export class User extends BaseEntity {
   @Column({ name: 'verification_doc', type: 'jsonb', nullable: true })
   verificationDoc: file;
 
-  @Column({ name: 'verified',type: 'boolean' })
+  @Column({ name: 'verified', type: 'boolean' })
   verified: boolean;
 
-  @Column({ name: 'disabled',type: 'boolean' })
+  @Column({ name: 'disabled', type: 'boolean' })
   disabled: boolean;
 
-  @Column({ name: 'last_seen',type: 'timestamp',  })
+  @Column({ name: 'last_seen', type: 'timestamp' })
   lastSeen: Date;
 
-  @Column({ name :'meta',type: 'jsonb', nullable: true })
+  @Column({ name: 'meta', type: 'jsonb', nullable: true })
   meta: {};
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
@@ -127,8 +127,8 @@ export class User extends BaseEntity {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
 
-  // @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp' })
-  // deletedAt?: Date;
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp' })
+  deletedAt?: Date;
 
   @ManyToOne(() => SubRole, (subRole) => subRole.user)
   subrole: SubRole;
@@ -148,7 +148,9 @@ export class User extends BaseEntity {
   @OneToMany(() => ReportedPosts, (reportedPosts) => reportedPosts.user)
   reportedPosts: ReportedPosts[];
 
-  @OneToMany(() => Catalogue, (catalogue) => catalogue.userOwner,{onDelete:'CASCADE'})
+  @OneToMany(() => Catalogue, (catalogue) => catalogue.userOwner, {
+    onDelete: 'CASCADE',
+  })
   catalogue: Catalogue[];
 
   @OneToMany(() => Contact, (contact) => contact.user)

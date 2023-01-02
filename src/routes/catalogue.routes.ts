@@ -37,7 +37,7 @@ router.post(
   ]),
   [
     body('name').isLength({ min: 3 }).withMessage('Enter your Name'),
-    body('description', 'Enter proper description ').optional(false),
+    body('description', 'Enter proper description '),
     body('isPrivate').isBoolean().withMessage('Enter the value for private'),
   ],
   (req: Request, res: Response, next: NextFunction) => {

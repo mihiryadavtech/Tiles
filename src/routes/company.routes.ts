@@ -47,7 +47,7 @@ router.post(
       .isLength({ min: 50, max: 200 })
       .withMessage('Enter proper Address'),
     body('latitude')
-      .isFloat({ min: 1 - 90, max: 90 })
+      .isFloat({ min: -90, max: 90 })
       .withMessage('Enter proper Latitude'),
     body('longitude')
       .isFloat({ min: -180, max: 180 })

@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { DataSource } from 'typeorm';
 import { Admin } from './entities/Admin.entity';
 import { AreaType } from './entities/AreaType.entity';
@@ -41,7 +43,7 @@ import { Subscription } from './entities/Subscription.entity';
 import { Type } from './entities/Type.entity';
 import { Unit } from './entities/Unit.entity';
 import { User } from './entities/User.Entity';
-import { UserDealingCategory } from './entities/UserDealingcategory.entity';
+import { UserDealingCategory } from './entities/UserDealingCategory.entity';
 
 const AppDataSource = new DataSource({
   type: 'postgres',
@@ -96,7 +98,7 @@ const AppDataSource = new DataSource({
     UserDealingCategory,
   ],
   migrations: ['src/migrations/*.ts'],
-  migrationsRun: true,
+  // migrationsRun: true,
   logging: true,
   synchronize: false,
 });

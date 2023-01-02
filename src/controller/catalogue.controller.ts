@@ -173,6 +173,11 @@ const getAllCatalogue = async (req: Request, res: Response) => {
         isPrivate: false,
       })
       .getMany();
+    if (!getAllCatalogue?.length) {
+      return res
+        .status(200)
+        .json(messageFunction('No catalog available to show'));
+    }
 
     return res.status(200).json({ data: getAllCatalogue });
   } catch (error) {

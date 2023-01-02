@@ -1,6 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
+const errorFunction = (error: any) => {
+  const errors = {
+    code: 400,
+    error: {
+      message: error.message,
+    },
+    message: 'Error due to Jwt verification',
+  };
+  return errors;
+};
+
 const authenticateToken = async (
   req: Request,
   res: Response,
@@ -16,7 +27,7 @@ const authenticateToken = async (
     req.app.set('user', user);
     return next();
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json(errorFunction(error));
   }
 };
 export = authenticateToken;

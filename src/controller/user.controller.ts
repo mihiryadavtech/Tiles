@@ -309,9 +309,11 @@ const getAllUser = async (req: Request, res: Response) => {
       const visitingCardUrlImage = `http://localhost:${process.env.PORT}/api/v1/image/${visitingCard?.filename}`;
 
       const verificationDoc = element?.company_verification_doc;
-      for (const item in verificationDoc) {
-        const image = verificationDoc[item];
+
+      for (let x = 0; x < verificationDoc.length; x++) {
+        const image = verificationDoc[x];
         const urlImage = `http://localhost:${process.env.PORT}/api/v1/image/${image.filename}`;
+        allUserWithUrl[index].company_verification_doc[x].imageurl = urlImage;
       }
       allUserWithUrl[index].company_profile_photo.imageurl =
         profilePhotoUrlImage;
@@ -329,12 +331,6 @@ const getAllUser = async (req: Request, res: Response) => {
 };
 //
 //
-//
-//
-//
-//
-//
-//
 
 const viewCatalog = async (req: Request, res: Response) => {
   try {
@@ -350,7 +346,7 @@ const viewCatalog = async (req: Request, res: Response) => {
       .select()
       .where({ status: status })
       .getMany();
-
+    console.log(typeof allCatalog);
     if (!allCatalog?.length) {
       return res
         .status(200)
