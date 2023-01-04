@@ -24,7 +24,9 @@ const storage = multer.diskStorage({
     );
   },
 });
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+});
 
 const router = Router();
 router.post(
@@ -92,6 +94,7 @@ router.patch(
   ]),
   updateCompany
 );
-// router.delete('/company', authenticateToken, deleteCompany);
+// delete
+router.delete('/company', authenticateToken, deleteCompany);
 
 export { router as companyRouter };

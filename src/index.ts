@@ -11,6 +11,7 @@ import { userRouter } from './routes/user.routes';
 import { companyRouter } from './routes/company.routes';
 import { catalogueRouter } from './routes/catalogue.routes';
 import { User } from './entities/User.Entity';
+import { AppError } from './utils/error';
 const userRepository = AppDataSource.getRepository(User);
 
 const app = express();
@@ -35,6 +36,14 @@ const main = async () => {
     app.use('/api/v1', userRouter);
     app.use('/api/v1', companyRouter);
     app.use('/api/v1', catalogueRouter);
+
+    app.use(
+      (error: AppError, req: Request, res: Response, next: NextFunction) => {
+        const status = error.statusCode || 400;
+        const message = error.message || 'Error has occurred';
+        return res.status(status).json(error.message);
+      }
+    );
 
     app.use('/', (req: Request, res: Response) => {
       res.json('hii There I am here');

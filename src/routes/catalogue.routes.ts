@@ -13,8 +13,10 @@ import {
 import multer from 'multer';
 import path from 'path';
 import authenticateToken from '../middleware/auth';
+import { AppError } from '../utils/error';
 
 const router = Router();
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/catalogue');
@@ -26,7 +28,28 @@ const storage = multer.diskStorage({
     );
   },
 });
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  fileFilter(req, file, callback) {
+    if (file.fieldname === 'pdf') {
+      if (file.mimetype === 'application/pdf') {
+        callback(null, true);
+      } else {
+        return callback(new AppError('Only pdf format allowed!', 400));
+      }
+    } else if (file.fieldname === 'previewImage') {
+      if (
+        file.mimetype == 'image/png' ||
+        file.mimetype == 'image/jpeg' ||
+        file.mimetype == 'image/jpg'
+      ) {
+        callback(null, true);
+      } else {
+        callback(new AppError('Only image format allowed!', 400));
+      }
+    }
+  },
+});
 
 router.post(
   '/catalogue',
