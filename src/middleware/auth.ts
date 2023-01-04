@@ -30,4 +30,4 @@ const authenticateToken = async (
     return res.status(400).json(errorFunction(error));
   }
 };
-export = authenticateToken;
+export  {authenticateToken};

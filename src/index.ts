@@ -1,18 +1,10 @@
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 dotenv.config();
-import cron from 'node-cron';
-import express, { Request, Response, NextFunction, urlencoded } from 'express';
+import express, { Request, Response } from 'express';
 import { AppDataSource } from './dataBaseConnection';
-import { mainRouter } from './routes/main.routes';
-import { adminRouter } from './routes/admin.routes';
-import { subroleRouter } from './routes/subrole.routes';
-import { userRouter } from './routes/user.routes';
-import { companyRouter } from './routes/company.routes';
-import { catalogueRouter } from './routes/catalogue.routes';
-import { User } from './entities/User.Entity';
 import { AppError } from './utils/error';
-const userRepository = AppDataSource.getRepository(User);
+import { indexRouter } from './routes/index.routes';
 
 const app = express();
 const Port = (process.env.PORT as string) || 3000;
@@ -30,18 +22,13 @@ const main = async () => {
     app.use(express.urlencoded({ extended: true }));
 
     // Routes
-    app.use('/api/v1', mainRouter);
-    app.use('/api/v1', adminRouter);
-    app.use('/api/v1', subroleRouter);
-    app.use('/api/v1', userRouter);
-    app.use('/api/v1', companyRouter);
-    app.use('/api/v1', catalogueRouter);
+
+    app.use('/api/v1', indexRouter);
 
     app.use(
-      (error: AppError, req: Request, res: Response, next: NextFunction) => {
+      (error: AppError, req: Request, res: Response) => {
         const status = error.statusCode || 400;
-        const message = error.message || 'Error has occurred';
-        return res.status(status).json(error.message);
+        return res.status(status).json({ Error: error.message });
       }
     );
 

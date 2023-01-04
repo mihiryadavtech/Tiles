@@ -1,12 +1,12 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
 import { createSubrole, getAllSubrole } from '../controller/subrole.controller';
-import authenticateToken from '../middleware/auth';
+import {authenticateToken} from '../middleware/auth';
 
 const router = Router();
-router.get('/subrole', authenticateToken, getAllSubrole);
+router.get('/', authenticateToken, getAllSubrole);
 router.post(
-  '/subrole',
+  '/',
   authenticateToken,
   [
     body('name')

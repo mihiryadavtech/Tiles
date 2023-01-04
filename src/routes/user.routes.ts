@@ -11,7 +11,7 @@ import {
 } from '../controller/user.controller';
 import multer from 'multer';
 import path from 'path';
-import authenticateToken from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
 
 const router = Router();
 const storage = multer.diskStorage({
@@ -28,7 +28,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post(
-  '/user/signup',
+  '/signup',
   upload.fields([
     { name: 'profilePhoto', maxCount: 1 },
     { name: 'verificationDoc', maxCount: 2 },
@@ -83,11 +83,11 @@ router.post(
   registerUser
 );
 
-router.post('/user/login', loginUser);
-router.get('/user', authenticateToken, getAllUser);
+router.post('/login', loginUser);
+router.get('/', authenticateToken, getAllUser);
 
 router.patch(
-  '/user',
+  '/',
   authenticateToken,
   upload.fields([
     { name: 'profilePhoto', maxCount: 1 },
@@ -96,9 +96,9 @@ router.patch(
   ]),
   updateUser
 );
-router.delete('/user', authenticateToken, deleteUser);
-router.get('/user/view', authenticateToken, viewCatalog);
-router.post('/user/bookmark', authenticateToken, bookmarkCatalogue);
+router.delete('/', authenticateToken, deleteUser);
+router.get('/view', authenticateToken, viewCatalog);
+router.post('/bookmark', authenticateToken, bookmarkCatalogue);
 
 //
 //

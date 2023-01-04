@@ -9,7 +9,7 @@ import {
   updateCompany,
 } from '../controller/company.controller';
 
-import authenticateToken from '../middleware/auth';
+import {authenticateToken} from '../middleware/auth';
 import multer from 'multer';
 import path from 'path';
 
@@ -30,7 +30,7 @@ const upload = multer({
 
 const router = Router();
 router.post(
-  '/company/signup',
+  '/signup',
   upload.fields([
     { name: 'logo', maxCount: 1 },
     { name: 'cta', maxCount: 2 },
@@ -83,10 +83,10 @@ router.post(
   registerCompany
 );
 
-router.post('/company/login', loginCompany);
-router.get('/company', authenticateToken, getAllCompany);
+router.post('/login', loginCompany);
+router.get('/', authenticateToken, getAllCompany);
 router.patch(
-  '/company',
+  '/',
   authenticateToken,
   upload.fields([
     { name: 'logo', maxCount: 1 },
@@ -95,6 +95,6 @@ router.patch(
   updateCompany
 );
 // delete
-router.delete('/company', authenticateToken, deleteCompany);
+router.delete('/', authenticateToken, deleteCompany);
 
 export { router as companyRouter };

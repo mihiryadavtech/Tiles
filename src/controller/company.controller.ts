@@ -158,8 +158,8 @@ const getAllCompany = async (req: Request, res: Response) => {
       .select()
       .getRawMany();
     let allCompanyWithUrl = allCompany;
-    for (let index = 0; index < allCompanyWithUrl.length; index++) {
-      const element = allCompanyWithUrl[index];
+    for (let index = 0; index < allCompanyWithUrl?.length; index++) {
+      const element = allCompanyWithUrl?.[index];
 
       const companyLogo = element?.company_logo;
       const companyLogoImage = `http://localhost:${process.env.PORT}/api/v1/image/${companyLogo?.filename}`;

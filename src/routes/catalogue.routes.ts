@@ -12,7 +12,7 @@ import {
 
 import multer from 'multer';
 import path from 'path';
-import authenticateToken from '../middleware/auth';
+import {authenticateToken} from '../middleware/auth';
 import { AppError } from '../utils/error';
 
 const router = Router();
@@ -52,7 +52,7 @@ const upload = multer({
 });
 
 router.post(
-  '/catalogue',
+  '/',
   authenticateToken,
   upload.fields([
     { name: 'pdf', maxCount: 1 },
@@ -75,7 +75,7 @@ router.post(
   createCatalogue
 );
 router.patch(
-  '/catalogue',
+  '/',
   authenticateToken,
   upload.fields([
     { name: 'pdf', maxCount: 1 },
@@ -83,11 +83,11 @@ router.patch(
   ]),
   updateCatalogue
 );
-router.get('/catalogue', authenticateToken, getAllCatalogue);
-router.delete('/catalogue', authenticateToken, deleteCatalogue);
-router.patch('/catalogue/private', cataloguePrivate);
+router.get('/', authenticateToken, getAllCatalogue);
+router.delete('/', authenticateToken, deleteCatalogue);
+router.patch('/private', cataloguePrivate);
 router.post(
-  '/catalogue/permission',
+  '/permission',
   authenticateToken,
   privateCataloguePermission
 );

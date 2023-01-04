@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
 import multer from 'multer';
 import path from 'path';
-import authenticateToken from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
 import {
   adminDeleteUser,
   adminRegisterUser,
@@ -24,13 +24,12 @@ const storage = multer.diskStorage({
       `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
     );
   },
-  
 });
 const upload = multer({ storage: storage });
 
-router.get('/admin', authenticateToken, getAllAdmin);
+router.get('/', authenticateToken, getAllAdmin);
 router.post(
-  '/admin/signup',
+  '/signup',
   [
     body('name').isLength({ min: 3 }).trim().withMessage('Enter proper Name'),
     body('email').isEmail().toLowerCase().withMessage('Enter proper Email'),
@@ -47,7 +46,7 @@ router.post(
   createAdmin
 );
 router.post(
-  '/admin/login',
+  '/login',
   [
     body('email').isEmail().toLowerCase().withMessage('Enter proper Email'),
     body('password').isLength({ min: 8 }).withMessage('Enter proper Password'),
@@ -63,10 +62,10 @@ router.post(
   loginAdmin
 );
 
-router.patch('/admin/approve', authenticateToken, approveCatalogue);
-router.delete('/admin/user', authenticateToken, adminDeleteUser);
+router.patch('/approve', authenticateToken, approveCatalogue);
+router.delete('/user', authenticateToken, adminDeleteUser);
 router.post(
-  '/admin/user',
+  '/user',
   authenticateToken,
   upload.fields([
     { name: 'profilePhoto', maxCount: 1 },
@@ -76,7 +75,7 @@ router.post(
   adminRegisterUser
 );
 router.patch(
-  '/admin/user',
+  '/user',
   authenticateToken,
   upload.fields([
     { name: 'profilePhoto', maxCount: 1 },
