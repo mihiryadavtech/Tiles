@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express, { Request, Response } from 'express';
 import { AppDataSource } from './dataBaseConnection';
-import { AppError } from './utils/error';
+import { AppError } from './exceptions/errorException';
 import { indexRouter } from './routes/index.routes';
 
 const app = express();
@@ -25,12 +25,11 @@ const main = async () => {
 
     app.use('/api/v1', indexRouter);
 
-    app.use(
-      (error: AppError, req: Request, res: Response) => {
-        const status = error.statusCode || 400;
-        return res.status(status).json({ Error: error.message });
-      }
-    );
+    app.use((error: AppError, req: Request, res: Response) => {
+      console.log(error)
+      const status = error.statusCode || 400;
+      return res.status(status).json({ Error: error.message });
+    });
 
     app.use('/', (req: Request, res: Response) => {
       res.json('hii There I am here');
@@ -40,7 +39,7 @@ const main = async () => {
       console.log(`Listening on ${Port}`);
     });
   } catch (error) {
-    console.log(error);
+    console.log('///////',error);
   }
 };
 main();

@@ -12,8 +12,8 @@ import {
 
 import multer from 'multer';
 import path from 'path';
-import {authenticateToken} from '../middleware/auth';
-import { AppError } from '../utils/error';
+import { authenticateToken } from '../middleware/auth';
+import { AppError } from '../exceptions/errorException';
 
 const router = Router();
 
@@ -86,10 +86,6 @@ router.patch(
 router.get('/', authenticateToken, getAllCatalogue);
 router.delete('/', authenticateToken, deleteCatalogue);
 router.patch('/private', cataloguePrivate);
-router.post(
-  '/permission',
-  authenticateToken,
-  privateCataloguePermission
-);
+router.post('/permission', authenticateToken, privateCataloguePermission);
 
 export { router as catalogueRouter };

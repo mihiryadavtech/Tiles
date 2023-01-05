@@ -346,7 +346,6 @@ const viewCatalog = async (req: Request, res: Response) => {
       .select()
       .where({ status: status })
       .getMany();
-    console.log(typeof allCatalog);
     if (!allCatalog?.length) {
       return res
         .status(200)

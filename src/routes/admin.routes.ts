@@ -12,6 +12,8 @@ import {
   getAllAdmin,
   loginAdmin,
 } from '../controller/admin.controller';
+import { adminSchema } from '../services/admin.serviecs';
+import { validation } from '../middleware/validation-error';
 
 const router = Router();
 const storage = multer.diskStorage({
@@ -30,19 +32,8 @@ const upload = multer({ storage: storage });
 router.get('/', authenticateToken, getAllAdmin);
 router.post(
   '/signup',
-  [
-    body('name').isLength({ min: 3 }).trim().withMessage('Enter proper Name'),
-    body('email').isEmail().toLowerCase().withMessage('Enter proper Email'),
-    body('password').isLength({ min: 8 }).withMessage('Enter proper Password'),
-  ],
-  (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ Message: errors?.array() });
-    }
-    return next();
-  },
+  adminSchema,
+  validation,
   createAdmin
 );
 router.post(
