@@ -1,19 +1,15 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { check, body, validationResult } from 'express-validator';
+import { Router } from 'express';
 
 import {
-  createCatalogue,
-  cataloguePrivate,
-  updateCatalogue,
-  getAllCatalogue,
-  deleteCatalogue,
-  privateCataloguePermission,
+  cataloguePrivate, createCatalogue, deleteCatalogue, getAllCatalogue, privateCataloguePermission, updateCatalogue
 } from '../controller/catalogue.controller';
 
 import multer from 'multer';
 import path from 'path';
-import { authenticateToken } from '../middleware/auth';
 import { AppError } from '../exceptions/errorException';
+import { authenticateToken } from '../middleware/auth';
+import { validation } from '../middleware/validation-error';
+import { createCatalogueValidation } from '../validations/catalogue.validation';
 
 const router = Router();
 
@@ -58,20 +54,8 @@ router.post(
     { name: 'pdf', maxCount: 1 },
     { name: 'previewImage', maxCount: 1 },
   ]),
-  [
-    body('name').isLength({ min: 3 }).withMessage('Enter your Name'),
-    body('description', 'Enter proper description '),
-    body('isPrivate').isBoolean().withMessage('Enter the value for private'),
-  ],
-  (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ Message: errors?.array() });
-    }
-
-    return next();
-  },
+  createCatalogueValidation,
+  validation,
   createCatalogue
 );
 router.patch(
@@ -89,3 +73,4 @@ router.patch('/private', cataloguePrivate);
 router.post('/permission', authenticateToken, privateCataloguePermission);
 
 export { router as catalogueRouter };
+

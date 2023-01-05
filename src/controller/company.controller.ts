@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import { AppError } from '../exceptions/errorException';
 import { AppDataSource } from '../dataBaseConnection';
 import { Admin } from '../entities/Admin.entity';
 import { Catalogue } from '../entities/Catalogue.entity';
@@ -109,7 +110,11 @@ const registerCompany = async (req: Request, res: Response) => {
   }
 };
 
-const loginCompany = async (req: Request, res: Response) => {
+const loginCompany = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { email, password } = req.body;
     const companyExist = await companyRepository
@@ -128,7 +133,10 @@ const loginCompany = async (req: Request, res: Response) => {
     const hashPassword = companyExist?.password;
     const correctPassword = await bcrypt.compare(password, hashPassword);
     if (!correctPassword) {
-      return res.status(400).json(messageFunction('Enter the proper password'));
+      throw new AppError("Enter password doesn't match", 401);
+      // return res
+      //   .status(400)
+      //   .json(messageFunction("Enter password doesn't match"));
     }
 
     const token = jwt.sign(
@@ -140,8 +148,10 @@ const loginCompany = async (req: Request, res: Response) => {
       .status(200)
       .json(messageFunction('Company User login successfully', token));
   } catch (error) {
-    const errors = errorFunction(error);
-    return res.status(400).json({ errors });
+    console.log('>>>>>///', error);
+    return next(error);
+    // const errors = errorFunction(error);
+    // return res.status(400).json({ errors });
   }
 };
 
@@ -170,7 +180,7 @@ const getAllCompany = async (req: Request, res: Response) => {
       allCompanyWithUrl[index].company_logo.imageurl = companyLogoImage;
       allCompanyWithUrl[index].company_cta.imageurl = ctaImage;
     }
-    
+
     return res.status(200).json({ data: allCompanyWithUrl });
   } catch (error) {
     const errors = errorFunction(error);

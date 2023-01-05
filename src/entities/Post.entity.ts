@@ -1,4 +1,4 @@
-import file from 'src/interfaces/file';
+import file from 'src/types/file';
 
 enum Status {
   INREVIEW = 0,
@@ -7,15 +7,14 @@ enum Status {
 }
 
 import {
-  Entity,
   BaseEntity,
   Column,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
   CreateDateColumn,
-  Timestamp,
+  Entity,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { AreaType } from './AreaType.entity';
 import { Category } from './Category.entity';

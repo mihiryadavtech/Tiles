@@ -1,4 +1,3 @@
-import file from 'src/interfaces/file';
 
 enum Inquiry_type {
   INREVIEW = 0,

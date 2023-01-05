@@ -1,4 +1,4 @@
-import file from 'src/interfaces/file';
+import file from 'src/types/file';
 
 import {
   Entity,

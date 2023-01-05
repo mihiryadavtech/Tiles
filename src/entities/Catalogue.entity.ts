@@ -1,4 +1,4 @@
-import file from 'src/interfaces/file';
+import file from 'src/types/file';
 enum Status {
   INREVIEW = 0,
   APPROVED = 1,
@@ -11,7 +11,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   CreateDateColumn,
-  Timestamp,
   ManyToOne,
   OneToMany,
 } from 'typeorm';
@@ -21,9 +20,7 @@ import { CatalogueSizes } from './CatalogueSizes.entity';
 import { CatalogueViewer } from './CatalogueViewer.entity';
 import { Category } from './Category.entity';
 import { Company } from './Company.entity';
-import { Post } from './Post.entity';
 import { PrivateCataloguePermission } from './PrivateCataloguePermission.entity';
-import { Product } from './Product.entity';
 import { User } from './User.Entity';
 
 @Entity('catalogue')

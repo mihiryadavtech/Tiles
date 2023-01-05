@@ -1,4 +1,4 @@
-import file from 'src/interfaces/file';
+import file from 'src/types/file';
 enum Role {
   BUYER = 1,
   SELLER = 2,
@@ -9,18 +9,15 @@ enum Doc {
 }
 
 import {
-  Entity,
   BaseEntity,
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  CreateDateColumn,
-  Timestamp,
-  OneToOne,
-  JoinColumn,
-  OneToMany,
-  ManyToOne,
-  DeleteDateColumn,
 } from 'typeorm';
 import { BookmarkedCatalogue } from './BookmarkedCatalogue.entity';
 import { Catalogue } from './Catalogue.entity';

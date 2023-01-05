@@ -12,8 +12,8 @@ import {
   getAllAdmin,
   loginAdmin,
 } from '../controller/admin.controller';
-import { adminSchema } from '../services/admin.serviecs';
 import { validation } from '../middleware/validation-error';
+import { adminLogin, adminRegister } from '../validations/admin.validation';
 
 const router = Router();
 const storage = multer.diskStorage({
@@ -30,28 +30,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.get('/', authenticateToken, getAllAdmin);
-router.post(
-  '/signup',
-  adminSchema,
-  validation,
-  createAdmin
-);
-router.post(
-  '/login',
-  [
-    body('email').isEmail().toLowerCase().withMessage('Enter proper Email'),
-    body('password').isLength({ min: 8 }).withMessage('Enter proper Password'),
-  ],
-  (req: Request, res: Response, next: NextFunction) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ Message: errors?.array() });
-    }
-    return next();
-  },
-  loginAdmin
-);
+router.post('/signup', adminRegister, validation, createAdmin);
+router.post('/login', adminLogin, validation, loginAdmin);
 
 router.patch('/approve', authenticateToken, approveCatalogue);
 router.delete('/user', authenticateToken, adminDeleteUser);

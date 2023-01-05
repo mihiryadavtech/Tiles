@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 const errorFunction = (error: any) => {
@@ -30,4 +30,5 @@ const authenticateToken = async (
     return res.status(400).json(errorFunction(error));
   }
 };
-export  {authenticateToken};
+export { authenticateToken };
+

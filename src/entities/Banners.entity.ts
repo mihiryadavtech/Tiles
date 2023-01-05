@@ -1,4 +1,4 @@
-import file from 'src/interfaces/file';
+import file from 'src/types/file';
 enum Route {
   INREVIEW = 0,
   APPROVED = 1,

@@ -1,14 +1,7 @@
-import file from 'src/interfaces/file';
 
 import {
-  Entity,
   BaseEntity,
-  Column,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  CreateDateColumn,
-  Timestamp,
-  OneToMany,
+  Column, Entity, OneToMany, PrimaryGeneratedColumn
 } from 'typeorm';
 import { AreaType } from './AreaType.entity';
 import { Attributes } from './Attributes.entity';

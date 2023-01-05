@@ -1,16 +1,7 @@
-import file from 'src/interfaces/file';
 
 import {
-  Entity,
-  BaseEntity,
-  Column,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  CreateDateColumn,
-  Timestamp,
-  ManyToOne,
+  BaseEntity, Entity, ManyToOne, PrimaryGeneratedColumn
 } from 'typeorm';
-import { Admin } from './Admin.entity';
 import { Features } from './Features.entity';
 import { Post } from './Post.entity';
 

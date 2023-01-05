@@ -1,15 +1,14 @@
-import file from 'src/interfaces/file';
+import file from 'src/types/file';
 
 import {
-  Entity,
   BaseEntity,
   Column,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
   CreateDateColumn,
-  Timestamp,
+  Entity,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Admin } from './Admin.entity';
 import { Category } from './Category.entity';

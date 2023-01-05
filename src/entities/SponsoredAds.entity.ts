@@ -1,18 +1,16 @@
-import file from 'src/interfaces/file';
+import file from 'src/types/file';
 
 import {
-  Entity,
   BaseEntity,
   Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  CreateDateColumn,
-  Timestamp,
-  ManyToOne,
 } from 'typeorm';
 import { Admin } from './Admin.entity';
 import { Company } from './Company.entity';
-import { User } from './User.Entity';
 @Entity('sponsoredads')
 export class SponsoredAds extends BaseEntity {
   @PrimaryGeneratedColumn()

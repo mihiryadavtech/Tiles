@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import cron from 'node-cron';
-import file from 'src/interfaces/file';
+import file from 'src/types/file';
 import { AppDataSource } from '../dataBaseConnection';
 import { BookmarkedCatalogue } from '../entities/BookmarkedCatalogue.entity';
 import { Catalogue } from '../entities/Catalogue.entity';

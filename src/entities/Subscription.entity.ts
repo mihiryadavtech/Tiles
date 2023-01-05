@@ -1,14 +1,8 @@
-import file from 'src/interfaces/file';
 
 import {
-  Entity,
   BaseEntity,
-  Column,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  CreateDateColumn,
-  Timestamp,
-  ManyToOne,
+  Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn,
+  UpdateDateColumn
 } from 'typeorm';
 import { Package } from './Package.entity';
 import { User } from './User.Entity';

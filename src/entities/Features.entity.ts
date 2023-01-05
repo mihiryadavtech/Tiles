@@ -1,4 +1,3 @@
-import file from 'src/interfaces/file';
 
 enum Config {
   CERAMIC = 'Ceramic_tiles_form',

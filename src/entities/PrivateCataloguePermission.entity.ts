@@ -1,4 +1,3 @@
-import file from 'src/interfaces/file';
 enum Status {
   INREVIEW = 0,
   APPROVED = 1,
@@ -6,17 +5,10 @@ enum Status {
 }
 
 import {
-  Entity,
   BaseEntity,
-  Column,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  CreateDateColumn,
-  Timestamp,
-  ManyToOne,
+  Column, Entity, ManyToOne, PrimaryGeneratedColumn
 } from 'typeorm';
 import { Catalogue } from './Catalogue.entity';
-import { Category } from './Category.entity';
 import { User } from './User.Entity';
 
 @Entity('privatecataloguepermission')

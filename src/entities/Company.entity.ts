@@ -1,18 +1,14 @@
-import file from 'src/interfaces/file';
+import file from 'src/types/file';
 
 import {
-  Entity,
   BaseEntity,
   Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  CreateDateColumn,
-  Timestamp,
-  OneToOne,
-  JoinColumn,
-  OneToMany,
-  ManyToMany,
-  ManyToOne,
 } from 'typeorm';
 import { Admin } from './Admin.entity';
 import { Banners } from './Banners.entity';
@@ -40,7 +36,7 @@ export class Company extends BaseEntity {
   @Column({ name: 'email', type: 'varchar', unique: true })
   email: string;
 
-  @Column({ name: 'password', type: 'varchar', })
+  @Column({ name: 'password', type: 'varchar' })
   password: string;
 
   @Column({ name: ' website', type: 'varchar', nullable: true })
