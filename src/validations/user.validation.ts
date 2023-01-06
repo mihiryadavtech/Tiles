@@ -80,14 +80,15 @@ const userRegister = checkSchema({
     errorMessage: 'Enter the name of the city',
   },
   gstNumber: {
-    isFloat: {
+    isNumeric: true,
+    isLength: {
       options: {
         min: 15,
         max: 15,
       },
     },
     trim: true,
-    errorMessage: 'Enter the name of the city',
+    errorMessage: 'Enter proper GST number',
   },
   companyName: {
     isLength: {
@@ -105,7 +106,7 @@ const userRegister = checkSchema({
       },
     },
     trim: true,
-    errorMessage: 'Enter the Company Name',
+    errorMessage: 'Enter the Company Address',
   },
   companyWebsite: {
     optional: true,
@@ -116,12 +117,12 @@ const userRegister = checkSchema({
     },
     errorMessage: 'Enter a proper website',
   },
-  visitingCard: {
+  docType: {
     isIn: {
       options: [[Doc.ADHAAR, Doc.PAN_CARD]],
     },
     trim: true,
-    errorMessage: 'Enter the name of the city',
+    errorMessage: 'Enter a proper Doc type',
   },
   verified: {
     isBoolean: true,

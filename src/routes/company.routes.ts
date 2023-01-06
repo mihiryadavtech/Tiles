@@ -1,11 +1,14 @@
 import { Router } from 'express';
+import { upload } from '../middleware/fileUpload';
 
 import {
-  deleteCompany, getAllCompany, loginCompany, registerCompany, updateCompany
+  deleteCompany,
+  getAllCompany,
+  loginCompany,
+  registerCompany,
+  updateCompany
 } from '../controller/company.controller';
 
-import multer from 'multer';
-import path from 'path';
 import { authenticateToken } from '../middleware/auth';
 import { validation } from '../middleware/validation-error';
 import {
@@ -13,28 +16,18 @@ import {
   companyRegister
 } from '../validations/company.validation';
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/company');
-  },
-  filename: (req, file, cb) => {
-    return cb(
-      null,
-      `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
-    );
-  },
-});
-const upload = multer({
-  storage: storage,
-});
+const uploadFiles = upload('Company', 5000000, [
+  ['application/pdf'],
+  ['image/jpeg', 'image/png', 'image/jpg'],
+]).fields([
+  { name: 'logo', maxCount: 1 },
+  { name: 'cta', maxCount: 2 },
+]);
 
 const router = Router();
 router.post(
   '/signup',
-  upload.fields([
-    { name: 'logo', maxCount: 1 },
-    { name: 'cta', maxCount: 2 },
-  ]),
+  uploadFiles,
   companyRegister,
   validation,
   registerCompany
@@ -45,10 +38,9 @@ router.get('/', authenticateToken, getAllCompany);
 router.patch(
   '/',
   authenticateToken,
-  upload.fields([
-    { name: 'logo', maxCount: 1 },
-    { name: 'cta', maxCount: 1 },
-  ]),
+  uploadFiles,
+  companyRegister,
+  validation,
   updateCompany
 );
 // delete

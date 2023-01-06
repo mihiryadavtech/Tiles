@@ -1,16 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-
-const errorFunction = (error: any) => {
-  const errors = {
-    code: 400,
-    error: {
-      message: error.message,
-    },
-    message: 'Error due to Jwt verification',
-  };
-  return errors;
-};
+import { AppError } from '../exceptions/errorException';
 
 const authenticateToken = async (
   req: Request,
@@ -21,14 +11,13 @@ const authenticateToken = async (
     const authenticationHeader = req?.headers?.['authorization'];
     const token = authenticationHeader && authenticationHeader?.split(' ')?.[1];
     if (!token) {
-      return res.status(400).json('User is unauthorized');
+      return next(new AppError('User is unauthorized', 401));
     }
     const user = jwt.verify(token, process.env.TOKEN_KEY as string);
     req.app.set('user', user);
     return next();
   } catch (error) {
-    return res.status(400).json(errorFunction(error));
+    return next(new AppError('Error due to Jwt verification', 500));
   }
 };
 export { authenticateToken };
-

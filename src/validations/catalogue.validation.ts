@@ -4,7 +4,6 @@ enum Status {
   APPROVED = 1,
   REJECTED = 2,
 }
-console.log(Status.APPROVED)
 const createCatalogueValidation = checkSchema({
   name: {
     isLength: {

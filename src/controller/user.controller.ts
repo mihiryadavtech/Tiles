@@ -83,13 +83,13 @@ const registerUser = async (req: Request, res: Response) => {
         .json(messageFunction('Mobile Number belongs to another User'));
     }
     const subRoleExist = await subRoleRepository
-      .createQueryBuilder('subrole')
+      .createQueryBuilder('subRole')
       .select()
       .where({ id: subrole })
       .getRawOne();
 
     if (!subRoleExist) {
-      return res.status(200).json(messageFunction("Subrole doesn't Exist"));
+      return res.status(200).json(messageFunction("Sub role doesn't Exist"));
     }
     const salt = await bcrypt.genSalt(saltRounds);
     const hashPassword = await bcrypt.hash(password, salt);

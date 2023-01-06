@@ -1,45 +1,30 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { body, validationResult } from 'express-validator';
+import { Router } from 'express';
 import {
+  bookmarkCatalogue,
+  deleteUser,
   getAllUser,
+  loginUser,
   registerUser,
   updateUser,
-  deleteUser,
-  loginUser,
-  viewCatalog,
-  bookmarkCatalogue,
+  viewCatalog
 } from '../controller/user.controller';
-import multer from 'multer';
-import path from 'path';
 import { authenticateToken } from '../middleware/auth';
-import { userRegister } from '../validations/user.validation';
+import { upload } from '../middleware/fileUpload';
 import { validation } from '../middleware/validation-error';
+import { userRegister } from '../validations/user.validation';
 
 const router = Router();
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/user');
-  },
-  filename: (req, file, cb) => {
-    return cb(
-      null,
-      `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
-    );
-  },
-});
-const upload = multer({ storage: storage });
 
-router.post(
-  '/signup',
-  upload.fields([
-    { name: 'profilePhoto', maxCount: 1 },
-    { name: 'verificationDoc', maxCount: 2 },
-    { name: 'visitingCard', maxCount: 1 },
-  ]),
-  userRegister,
-  validation,
-  registerUser
-);
+const uploadFiles = upload('Company', 5000000, [
+  ['application/pdf'],
+  ['image/jpeg', 'image/png', 'image/jpg'],
+]).fields([
+  { name: 'profilePhoto', maxCount: 1 },
+  { name: 'verificationDoc', maxCount: 2 },
+  { name: 'visitingCard', maxCount: 1 },
+]);
+
+router.post('/signup', uploadFiles, userRegister, validation, registerUser);
 
 router.post('/login', loginUser);
 router.get('/', authenticateToken, getAllUser);
@@ -47,20 +32,14 @@ router.get('/', authenticateToken, getAllUser);
 router.patch(
   '/',
   authenticateToken,
-  upload.fields([
-    { name: 'profilePhoto', maxCount: 1 },
-    { name: 'verificationDoc', maxCount: 2 },
-    { name: 'visitingCard', maxCount: 1 },
-  ]),
+  uploadFiles,
+  userRegister,
+  validation,
   updateUser
 );
 router.delete('/', authenticateToken, deleteUser);
 router.get('/view', authenticateToken, viewCatalog);
 router.post('/bookmark', authenticateToken, bookmarkCatalogue);
 
-//
-//
-//
-//
-
 export { router as userRouter };
+
