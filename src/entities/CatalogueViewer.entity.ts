@@ -11,7 +11,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { Catalogue } from './Catalogue.entity';
-import { User } from './User.Entity';
+import { User } from './User.entity';
 
 @Entity('catalogueviewer')
 export class CatalogueViewer extends BaseEntity {

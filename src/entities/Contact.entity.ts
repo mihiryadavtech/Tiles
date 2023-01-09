@@ -14,7 +14,7 @@ import {
 import { Admin } from './Admin.entity';
 import { Company } from './Company.entity';
 import { CompanyUser } from './CompanyUser.entity';
-import { User } from './User.Entity';
+import { User } from './User.entity';
 @Entity('contact')
 export class Contact extends BaseEntity {
   @PrimaryGeneratedColumn()

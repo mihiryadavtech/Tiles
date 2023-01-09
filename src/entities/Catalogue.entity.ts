@@ -21,7 +21,7 @@ import { CatalogueViewer } from './CatalogueViewer.entity';
 import { Category } from './Category.entity';
 import { Company } from './Company.entity';
 import { PrivateCataloguePermission } from './PrivateCataloguePermission.entity';
-import { User } from './User.Entity';
+import { User } from './User.entity';
 
 @Entity('catalogue')
 export class Catalogue extends BaseEntity {

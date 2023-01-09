@@ -5,7 +5,7 @@ import {
   UpdateDateColumn
 } from 'typeorm';
 import { Package } from './Package.entity';
-import { User } from './User.Entity';
+import { User } from './User.entity';
 
 @Entity('subscription')
 export class Subscription extends BaseEntity {

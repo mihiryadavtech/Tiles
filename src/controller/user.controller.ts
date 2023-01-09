@@ -7,7 +7,7 @@ import { AppDataSource } from '../dataBaseConnection';
 import { BookmarkedCatalogue } from '../entities/BookmarkedCatalogue.entity';
 import { Catalogue } from '../entities/Catalogue.entity';
 import { SubRole } from '../entities/SubRole.entity';
-import { User } from '../entities/User.Entity';
+import { User } from '../entities/User.entity';
 const saltRounds = 12;
 
 const errorFunction = (error: any) => {

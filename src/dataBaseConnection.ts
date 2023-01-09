@@ -42,8 +42,8 @@ import { SubRole } from './entities/SubRole.entity';
 import { Subscription } from './entities/Subscription.entity';
 import { Type } from './entities/Type.entity';
 import { Unit } from './entities/Unit.entity';
-import { User } from './entities/User.Entity';
-import { UserDealingCategory } from './entities/UserDealingCategory.entity';
+import { User } from './entities/User.entity';
+import { UserDealingCategory } from './entities/UserDealingcategory.entity';
 
 const AppDataSource = new DataSource({
   type: 'postgres',

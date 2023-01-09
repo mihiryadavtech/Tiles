@@ -27,7 +27,7 @@ import { ReportedPosts } from './ReportedPosts.entity';
 import { SalesType } from './SalesType.entity';
 import { Size } from './Size.entity';
 import { Unit } from './Unit.entity';
-import { User } from './User.Entity';
+import { User } from './User.entity';
 
 @Entity('post')
 export class Post extends BaseEntity {

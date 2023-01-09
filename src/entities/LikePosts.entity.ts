@@ -3,7 +3,7 @@ import {
   BaseEntity, Entity, ManyToOne, PrimaryGeneratedColumn
 } from 'typeorm';
 import { Post } from './Post.entity';
-import { User } from './User.Entity';
+import { User } from './User.entity';
 
 @Entity('likeposts')
 export class LikePosts extends BaseEntity {

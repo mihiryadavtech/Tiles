@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Admin } from './Admin.entity';
 import { Company } from './Company.entity';
-import { User } from './User.Entity';
+import { User } from './User.entity';
 
 @Entity('subrole')
 export class SubRole extends BaseEntity {

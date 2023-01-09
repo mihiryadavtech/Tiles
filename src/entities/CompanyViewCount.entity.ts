@@ -16,7 +16,7 @@ enum Action {
 } from 'typeorm';
 import { Company } from './Company.entity';
 import { Package } from './Package.entity';
-import { User } from './User.Entity';
+import { User } from './User.entity';
 
 @Entity('companyviewcount')
 export class CompanyViewCount extends BaseEntity {

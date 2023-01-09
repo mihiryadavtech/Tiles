@@ -3,7 +3,7 @@ import { AppDataSource } from '../dataBaseConnection';
 import { Catalogue } from '../entities/Catalogue.entity';
 import { Company } from '../entities/Company.entity';
 import { PrivateCataloguePermission } from '../entities/PrivateCataloguePermission.entity';
-import { User } from '../entities/User.Entity';
+import { User } from '../entities/User.entity';
 
 const errorFunction = (error: any) => {
   const errors = {

@@ -3,7 +3,7 @@ import {
   BaseEntity, Entity, ManyToOne, PrimaryGeneratedColumn
 } from 'typeorm';
 import { Category } from './Category.entity';
-import { User } from './User.Entity';
+import { User } from './User.entity';
 
 @Entity('userdealingcategory')
 export class UserDealingCategory extends BaseEntity {

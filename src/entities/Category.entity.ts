@@ -24,7 +24,7 @@ import { Post } from './Post.entity';
 import { PrivateCataloguePermission } from './PrivateCataloguePermission.entity';
 import { Product } from './Product.entity';
 import { Type } from './Type.entity';
-import { UserDealingCategory } from './UserDealingCategory.entity';
+import { UserDealingCategory } from './UserDealingcategory.entity';
 @Entity('category')
 export class Category extends BaseEntity {
   @PrimaryGeneratedColumn()

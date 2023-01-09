@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import { Catalogue } from '../entities/Catalogue.entity';
 import { Company } from '../entities/Company.entity';
 import { SubRole } from '../entities/SubRole.entity';
-import { User } from '../entities/User.Entity';
+import { User } from '../entities/User.entity';
 const saltRounds = 12;
 
 const errorFunction = (error: any) => {

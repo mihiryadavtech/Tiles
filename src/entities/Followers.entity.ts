@@ -2,7 +2,7 @@
 import {
   BaseEntity, Entity, ManyToOne, PrimaryGeneratedColumn
 } from 'typeorm';
-import { User } from './User.Entity';
+import { User } from './User.entity';
 
 @Entity('followers')
 export class Followers extends BaseEntity {

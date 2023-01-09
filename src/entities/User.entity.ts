@@ -32,7 +32,7 @@ import { PrivateCataloguePermission } from './PrivateCataloguePermission.entity'
 import { ReportedPosts } from './ReportedPosts.entity';
 import { SubRole } from './SubRole.entity';
 import { Subscription } from './Subscription.entity';
-import { UserDealingCategory } from './UserDealingCategory.entity';
+import { UserDealingCategory } from './UserDealingcategory.entity';
 
 @Entity('user')
 export class User extends BaseEntity {

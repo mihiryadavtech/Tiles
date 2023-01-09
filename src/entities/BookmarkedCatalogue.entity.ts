@@ -3,7 +3,7 @@ import {
   BaseEntity, Entity, ManyToOne, PrimaryGeneratedColumn
 } from 'typeorm';
 import { Catalogue } from './Catalogue.entity';
-import { User } from './User.Entity';
+import { User } from './User.entity';
 @Entity('bookmarkedcatalogue')
 export class BookmarkedCatalogue extends BaseEntity {
   @PrimaryGeneratedColumn()

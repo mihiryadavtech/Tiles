@@ -5,7 +5,7 @@ import {
 } from 'typeorm';
 
 import { Post } from './Post.entity';
-import { User } from './User.Entity';
+import { User } from './User.entity';
 
 @Entity('postviewer')
 export class PostViewer extends BaseEntity {
