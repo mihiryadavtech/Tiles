@@ -13,7 +13,7 @@ const Port = (process.env.PORT as string) || 3000;
 
 const main = async () => {
   try {
-    //Database Intilaization
+    //Database Initialization
     await AppDataSource.initialize();
     // image Show
     app.use('/api/v1/image', express.static('uploads/user'));

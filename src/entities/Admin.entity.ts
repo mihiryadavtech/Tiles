@@ -1,7 +1,9 @@
-
 import {
   BaseEntity,
-  Column, Entity, OneToMany, PrimaryGeneratedColumn
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { AreaType } from './AreaType.entity';
 import { Attributes } from './Attributes.entity';
@@ -37,7 +39,7 @@ export class Admin extends BaseEntity {
 
   @Column({ name: 'password', type: 'varchar' })
   password: string;
-  
+
   @OneToMany(() => SubRole, (subRole) => subRole.admin)
   subrole: SubRole[];
 
